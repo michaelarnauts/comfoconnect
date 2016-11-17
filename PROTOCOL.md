@@ -55,6 +55,7 @@ If the PIN is 0000, the field should be 0x00, otherwise, it should be written as
 | Name                      | `0x11` `Phone van Michael`           | Length + A string containing the display name of your client |
 
 In case of a failure (invalid PIN), the bridge will respond with the following message:
+
 | Field                     | Data                                 | Remark    |
 |---------------------------|--------------------------------------|-----------|
 | Command 1 (32 bit)        | `0x0006`                             | _Unknown_ |
@@ -64,6 +65,7 @@ In case of a failure (invalid PIN), the bridge will respond with the following m
 
 
 In case of success, the bridge will then respond with the following message:
+
 | Field                     | Data                                 | Remark    |
 |---------------------------|--------------------------------------|-----------|
 | Command 1 (32 bit)        | `0x0004`                             | _Unknown_ |
@@ -73,6 +75,7 @@ In case of success, the bridge will then respond with the following message:
 # Login session
 
 The client logs in by sending the following message:
+
 | Field                     | Data                                 | Remark    |
 |---------------------------|--------------------------------------|-----------|
 | Command 1 (32 bit)        | `0x0004`                             | _Unknown_ |
@@ -83,6 +86,7 @@ The client logs in by sending the following message:
 In case of success, the bridge will then respond with a series of messages:
 
 First, it will ACK the login message
+
 | Field                     | Data                                 | Remark    |
 |---------------------------|--------------------------------------|-----------|
 | Command 1 (32 bit)        | `0x0006`                             | _Unknown_ |
@@ -91,6 +95,7 @@ First, it will ACK the login message
 | Ack'ed sequence number    | `0x2003`                             | This references a send message |
 
 Next, we see some other messages. I don't know what they mean.
+
 | Field                     | Data                                 | Remark    |
 |---------------------------|--------------------------------------|-----------|
 | Command 1 (32 bit)        | `0x0002`                             | _Unknown_ |

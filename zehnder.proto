@@ -1,0 +1,408 @@
+message DiscoveryOperation {
+ optional SearchGatewayRequest searchGatewayRequest = 1;
+ optional SearchGatewayResponse searchGatewayResponse = 2;
+}
+
+message SearchGatewayRequest {
+}
+
+message SearchGatewayResponse {
+ required string ipaddress = 1;
+ required bytes uuid = 2;
+ required uint32 version = 3;
+}
+
+message GatewayOperation {
+
+ enum OperationType {
+  NoOperation = 0;
+  SetAddressRequestType = 1;
+  RegisterAppRequestType = 2;
+  StartSessionRequestType = 3;
+  CloseSessionRequestType = 4;
+  ListRegisteredAppsRequestType = 5;
+  DeregisterAppRequestType = 6;
+  ChangePinRequestType = 7;
+  GetRemoteAccessIdRequestType = 8;
+  SetRemoteAccessIdRequestType = 9;
+  GetSupportIdRequestType = 10;
+  SetSupportIdRequestType = 11;
+  GetWebIdRequestType = 12;
+  SetWebIdRequestType = 13;
+  SetPushIdRequestType = 14;
+  DebugRequestType = 15;
+  UpgradeRequestType = 16;
+  SetDeviceSettingsRequestType = 17;
+  VersionRequestType = 18;
+  SetAddressConfirmType = 51;
+  RegisterAppConfirmType = 52;
+  StartSessionConfirmType = 53;
+  CloseSessionConfirmType = 54;
+  ListRegisteredAppsConfirmType = 55;
+  DeregisterAppConfirmType = 56;
+  ChangePinConfirmType = 57;
+  GetRemoteAccessIdConfirmType = 58;
+  SetRemoteAccessIdConfirmType = 59;
+  GetSupportIdConfirmType = 60;
+  SetSupportIdConfirmType = 61;
+  GetWebIdConfirmType = 62;
+  SetWebIdConfirmType = 63;
+  SetPushIdConfirmType = 64;
+  DebugConfirmType = 65;
+  UpgradeConfirmType = 66;
+  SetDeviceSettingsConfirmType = 67;
+  VersionConfirmType = 68;
+  GatewayNotificationType = 100;
+  KeepAliveType = 101;
+  FactoryResetType = 102;
+  CnTimeRequestType = 30;
+  CnTimeConfirmType = 31;
+  CnNodeRequestType = 42;
+  CnNodeNotificationType = 32;
+  CnRmiRequestType = 33;
+  CnRmiResponseType = 34;
+  CnRmiAsyncRequestType = 35;
+  CnRmiAsyncConfirmType = 36;
+  CnRmiAsyncResponseType = 37;
+  CnRpdoRequestType = 38;
+  CnRpdoConfirmType = 39;
+  CnRpdoNotificationType = 40;
+  CnAlarmNotificationType = 41;
+  CnFupReadRegisterRequestType = 70;
+  CnFupReadRegisterConfirmType = 71;
+  CnFupProgramBeginRequestType = 72;
+  CnFupProgramBeginConfirmType = 73;
+  CnFupProgramRequestType = 74;
+  CnFupProgramConfirmType = 75;
+  CnFupProgramEndRequestType = 76;
+  CnFupProgramEndConfirmType = 77;
+  CnFupReadRequestType = 78;
+  CnFupReadConfirmType = 79;
+  CnFupResetRequestType = 80;
+  CnFupResetConfirmType = 81;
+ }
+
+ enum GatewayResult {
+  OK = 0;
+  BAD_REQUEST = 1;
+  INTERNAL_ERROR = 2;
+  NOT_REACHABLE = 3;
+  OTHER_SESSION = 4;
+  NOT_ALLOWED = 5;
+  NO_RESOURCES = 6;
+  NOT_EXIST = 7;
+  RMI_ERROR = 8;
+ }
+ optional GatewayOperation.OperationType type = 1;
+ optional GatewayOperation.GatewayResult result = 2;
+ optional string resultDescription = 3;
+ optional uint32 reference = 4;
+}
+
+message GatewayNotification {
+ repeated bytes pushUUIDs = 1;
+ optional CnAlarmNotification alarm = 2;
+}
+
+message KeepAlive {
+}
+
+message FactoryReset {
+ required bytes resetKey = 1;
+}
+
+message SetDeviceSettingsRequest {
+ required bytes macAddress = 1;
+ required string serialNumber = 2;
+}
+
+message SetDeviceSettingsConfirm {
+}
+
+message SetAddressRequest {
+ required bytes uuid = 1;
+}
+
+message SetAddressConfirm {
+}
+
+message RegisterAppRequest {
+ required bytes uuid = 1;
+ required uint32 pin = 2;
+ required string devicename = 3;
+}
+
+message RegisterAppConfirm {
+}
+
+message StartSessionRequest {
+ optional bool takeover = 1;
+}
+
+message StartSessionConfirm {
+ optional string devicename = 1;
+ optional bool resumed = 2;
+}
+
+message CloseSessionRequest {
+}
+
+message CloseSessionConfirm {
+}
+
+message ListRegisteredAppsRequest {
+}
+
+message ListRegisteredAppsConfirm {
+ message App {
+  required bytes uuid = 1;
+  required string devicename = 2;
+ }
+
+ repeated ListRegisteredAppsConfirm.App apps = 1;
+}
+
+message DeregisterAppRequest {
+ required bytes uuid = 1;
+}
+
+message DeregisterAppConfirm {
+}
+
+message ChangePinRequest {
+ required uint32 oldpin = 1;
+ required uint32 newpin = 2;
+}
+
+message ChangePinConfirm {
+}
+
+message GetRemoteAccessIdRequest {
+}
+
+message GetRemoteAccessIdConfirm {
+ optional bytes uuid = 1;
+}
+
+message SetRemoteAccessIdRequest {
+ optional bytes uuid = 1;
+}
+
+message SetRemoteAccessIdConfirm {
+}
+
+message GetSupportIdRequest {
+}
+
+message GetSupportIdConfirm {
+ optional bytes uuid = 1;
+ optional uint32 remainingTime = 2;
+}
+
+message SetSupportIdRequest {
+ optional bytes uuid = 1;
+ optional uint32 validTime = 2;
+}
+
+message SetSupportIdConfirm {
+}
+
+message GetWebIdRequest {
+}
+
+message GetWebIdConfirm {
+ optional bytes uuid = 1;
+}
+
+message SetWebIdRequest {
+ optional bytes uuid = 1;
+}
+
+message SetWebIdConfirm {
+}
+
+message SetPushIdRequest {
+ optional bytes uuid = 1;
+}
+
+message SetPushIdConfirm {
+}
+
+message UpgradeRequest {
+
+ enum UpgradeRequestCommand {
+  UPGRADE_START = 0;
+  UPGRADE_CONTINUE = 1;
+  UPGRADE_FINISH = 2;
+  UPGRADE_ABORT = 3;
+ }
+ optional UpgradeRequest.UpgradeRequestCommand command = 1;
+ optional bytes chunk = 2;
+}
+
+message UpgradeConfirm {
+}
+
+message DebugRequest {
+
+ enum DebugRequestCommand {
+  DBG_ECHO = 0;
+  DBG_SLEEP = 1;
+  DBG_SESSION_ECHO = 2;
+  DBG_PRINT_SETTINGS = 3;
+  DBG_ALARM = 4;
+  DBG_LED = 5;
+  DBG_GPI = 6;
+  DBG_GPO = 7;
+  DBG_RS232_WRITE = 8;
+  DBG_RS232_READ = 9;
+  DBG_CAN_WRITE = 10;
+  DBG_CAN_READ = 11;
+  DBG_KNX_WRITE = 12;
+  DBG_KNX_READ = 13;
+  DBG_TOGGLE = 14;
+  DBG_REBOOT = 15;
+  DBG_CLOUD = 16;
+  DBG_EEPROM_READ = 17;
+  DBG_EEPROM_WRITE = 18;
+ }
+ required DebugRequest.DebugRequestCommand command = 1;
+ optional int32 argument = 2;
+}
+
+message DebugConfirm {
+ required int32 result = 1;
+}
+
+message VersionRequest {
+}
+
+message VersionConfirm {
+ required uint32 gatewayVersion = 1;
+ required string serialNumber = 2;
+ required uint32 comfoNetVersion = 3;
+}
+
+message CnTimeRequest {
+ optional uint32 setTime = 1;
+}
+
+message CnTimeConfirm {
+ required uint32 currentTime = 1;
+}
+
+message CnNodeRequest {
+}
+
+message CnNodeNotification {
+
+ enum NodeModeType {
+  NODE_LEGACY = 0;
+  NODE_OFFLINE = 1;
+  NODE_NORMAL = 2;
+  NODE_UPDATE = 3;
+ }
+ required uint32 nodeId = 1;
+ optional uint32 productId = 2 [default = 0];
+ optional uint32 zoneId = 3;
+ optional CnNodeNotification.NodeModeType mode = 4;
+}
+
+message CnRmiRequest {
+ required uint32 nodeId = 1;
+ required bytes message = 2;
+}
+
+message CnRmiResponse {
+ optional uint32 result = 1 [default = 0];
+ optional bytes message = 2;
+}
+
+message CnRmiAsyncRequest {
+ required uint32 nodeId = 1;
+ required bytes message = 2;
+}
+
+message CnRmiAsyncConfirm {
+ optional uint32 result = 1 [default = 0];
+}
+
+message CnRmiAsyncResponse {
+ optional uint32 result = 1 [default = 0];
+ optional bytes message = 2;
+}
+
+message CnRpdoRequest {
+ required uint32 pdid = 1;
+ optional uint32 zone = 2 [default = 255];
+ optional uint32 type = 3;
+ optional uint32 timeout = 4 [default = 4294967295];
+}
+
+message CnRpdoConfirm {
+}
+
+message CnRpdoNotification {
+ required uint32 pdid = 1;
+ required bytes data = 2;
+}
+
+message CnAlarmNotification {
+ optional uint32 zone = 1;
+ optional uint32 productId = 2;
+ optional uint32 productVariant = 3;
+ optional string serialNumber = 4;
+ optional uint32 swProgramVersion = 5;
+ optional bytes errors = 6;
+ optional uint32 errorId = 7;
+ optional uint32 nodeId = 8;
+}
+
+message CnFupReadRegisterRequest {
+ required uint32 node = 1;
+ required uint32 registerId = 2;
+ optional uint32 index = 3;
+}
+
+message CnFupReadRegisterConfirm {
+ required uint32 value = 1;
+}
+
+message CnFupProgramBeginRequest {
+ repeated uint32 node = 1;
+ optional uint32 block = 2 [default = 0];
+}
+
+message CnFupProgramBeginConfirm {
+}
+
+message CnFupProgramRequest {
+ required bytes chunk = 1;
+}
+
+message CnFupProgramConfirm {
+}
+
+message CnFupProgramEndRequest {
+}
+
+message CnFupProgramEndConfirm {
+}
+
+message CnFupReadRequest {
+ required uint32 node = 1;
+ optional uint32 block = 2 [default = 0];
+}
+
+message CnFupReadConfirm {
+ optional bytes chunk = 1;
+ optional bool last = 2 [default = false];
+}
+
+message CnFupResetRequest {
+ required uint32 node = 1;
+}
+
+message CnFupResetConfirm {
+}
+

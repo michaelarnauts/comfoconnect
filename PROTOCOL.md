@@ -62,14 +62,14 @@ The `op_length` fields indicates the length of the `op` field, the rest of the d
 Note that only `op` and `msg` is valid Protocol Buffers data. The other fields should not be parsed.
 
 ### Header
-| Field                 | Data                                         | Remark         |
-|-----------------------|----------------------------------------------|----------------|
+| Field                 | Data                                         | Remark                                        |
+|-----------------------|----------------------------------------------|-----------------------------------------------|
 | length (32 bit)       | `0x0000004f`                                 | Length of the whole message excluding this field |
-| src (12 bytes)        | `0xaf154804169043898d2da77148f886be`         |                |
-| dst (12 bytes)        | `0x0000000000251010800170b3d54264b4`         |                |
-| oplength (16 bit)     | `0x0004`                                     | Length of the `op` message |
-| op (variable length)  | `0x08342002`                                 | Message with type `GatewayOperation` |
-| msg (variable length) | `...`                                        | Message with type that is documented in `op` |
+| src (12 bytes)        | `0xaf154804169043898d2da77148f886be`         |                                               |
+| dst (12 bytes)        | `0x0000000000251010800170b3d54264b4`         |                                               |
+| oplength (16 bit)     | `0x0004`                                     | Length of the `op` message                    |
+| op (variable length)  | `0x08342002`                                 | Message with type `GatewayOperation`          |
+| msg (variable length) | `...`                                        | Message with type that is documented in `op`  |
 
 ### Commands
 
@@ -211,83 +211,65 @@ This is a list of the commands.
 
 ### RegisterApp (`RegisterAppRequestType` and `RegisterAppConfirmType`)
 Before you can login, you need to register your device, by sending `RegisterAppRequestType`.
-```
-0004 08022002 0a10a886190220044d68a07d85a2e3866fce10001a126950686f6e652076616e2044657374696e79
-```
 ```javascript
-uuid: "\250\206\031\002 \004Mh\240}\205\242\343\206o\316"
+type: RegisterAppRequestType
+reference: 15
+
+uuid: "\251\226\031\002 \004Mh\240}\205\242\343\206o\312"
 pin: 0
-devicename: "iPhone van Destiny"
+devicename: "Computer"
 ```
 
 The bridge will respond with a `RegisterAppConfirmType`.
 
 In case of success, it will respond like this:
-```
-08342002
-```
 ```javascript
 type: RegisterAppConfirmType
-reference: 2
+reference: 15
 ```
 
 In case of a failure (invalid PIN), it will respond with a `RegisterAppConfirmType`, but with result `NOT_ALLOWED`.
 ```
-083410052002
-```
-```
 type: RegisterAppConfirmType
 result: NOT_ALLOWED
-reference: 2
+reference: 15
 ```
 
 ## StartSession
 The client logs in by sending a `StartSessionRequestType`.
-```
-0004 0803203e
-```
 ```javascript
 type: StartSessionRequestType
-reference: 62
+reference: 16
 ```
 
 In case of a success, it will respond with a `OK`.
-```
-0004 08351000203e
-```
 ```javascript
 type: StartSessionConfirmType
 result: OK
-reference: 62
+reference: 16
 ```
 
-Next, we see the following messages. I don't know what they mean.
-```
-0002 08200801100118012002
-```
+Next, we see a few notifications. I guess they are messages to let the app know what type if device it is.
 ```javascript
 type: CnNodeNotificationType
-result: NOT_ALLOWED
-reference: 2
-1: 48
-3: 255
+
+nodeId: 1
+productId: 1
+zoneId: 1
+mode: NODE_NORMAL
 ```
 
-```
-0002 08200830100518ff012002
-```
 ```javascript
-type: SetAddressRequestType
-result: BAD_REQUEST
-reference: 2
-3: 1
+type: CnNodeNotificationType
+
+nodeId: 48
+productId: 5
+zoneId: 255
+mode: NODE_NORMAL
 ```
 
 ### CloseSession
 The client logs out by sending a `CloseSessionRequestType`
-```
-0002 0804
-```
 ```javascript
 type: CloseSessionRequestType
 ```

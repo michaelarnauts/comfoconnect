@@ -10,85 +10,43 @@ parser.add_argument("my_uuid", help="uuid of the local machine")
 
 args = parser.parse_args()
 
+
 def callback(cmd, msg):
+    print(cmd)
+    print(msg)
     pass
 
 
 bridge = comfoconnect.Bridge(args.ip, args.uuid, callback)
 bridge.connect(args.my_uuid)
 
-# Register with the bridge
 try:
-    bridge.RegisterApp('Computer', 0)
-    print("Successfully registered")
-except:
-    print('Could not register. Invalid PIN!')
-    exit(1)
+    # Start session
+    bridge.StartSession()
 
-# Start session
-bridge.StartSession()
+except Exception as e:
+    try:
+        # Register with the bridge
+        bridge.RegisterApp('Computer', 0)
+        print("Successfully registered")
+
+    except Exception as e:
+        print('Could not register. Invalid PIN!')
+        exit(1)
 
 # Read a notification message
 cmd, msg = bridge._read_message()
 
 # Read a notification message
 cmd, msg = bridge._read_message()
+
+# List registered apps
+apps = bridge.ListRegisteredApps()
+print(apps)
+
+#bridge.DeregisterApp('a996190220044d68a07d85a2e3866fcd')
+
+#bridge.DeregisterApp('a996190220044d68a07d85a2e3866fce')
 
 # Close session
 bridge.CloseSession()
-
-
-
-
-
-#
-#
-#
-# # Login
-# msg = GatewayOperation()
-# msg.type = GatewayOperation.OperationType.Value('StartSessionRequestType')
-# msg.reference = 1
-# send_message(tcpsocket, 4, msg)
-#
-# # Login reply
-# rpl = get_message(tcpsocket, GatewayOperation)
-# print(rpl)
-#
-# tcpsocket.close()
-#
-
-
-# Logout
-# msg = zehnder_pb2.GatewayOperation()
-# msg.type = zehnder_pb2.GatewayOperation.OperationType.Value('CloseSessionRequestType')
-# print(msg)
-
-# login = zehnder_pb2.GatewayOperation()
-#
-# print(login.OperationType.)
-
-# login.OperationType = zehnder_pb2.StartSessionRequest
-# print(login.SerializeToString())
-
-# Send login command
-# login = zehnder_pb2.GatewayOperation()
-# login.OperationType = zehnder_pb2._REGISTERAPPREQUEST
-# print(login)
-
-# data = tcpsocket.recv(4)
-# print(data)
-
-# Try to read response
-# parser = zehnder_pb2.DiscoveryOperation()
-# while True:
-#     try:
-#         udpsocket.settimeout(5)
-#         data, source = udpsocket.recvfrom(100)
-#         if data:
-#             parser.ParseFromString(data)
-#             print("Found bridge:")
-#             print("* IP:      %s" % parser.searchGatewayResponse.ipaddress)
-#             print("  UUID:    %s" % parser.searchGatewayResponse.uuid.hex())
-#             print("  VERSION: %d" % parser.searchGatewayResponse.version)
-#     except socket.timeout:
-#         break

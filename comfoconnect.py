@@ -196,15 +196,16 @@ class Bridge(object):
     local_uuid = None
 
     socket = None
+    reference = None
 
-    callback = None
+    notification_callback = None
 
-    reference = 0
-
-    def __init__(self, ip, uuid, callback=None):
+    def __init__(self, ip, uuid, notification_callback=None):
         self.ip = ip
         self.uuid = uuid
-        self.callback = callback
+        self.notification_callback = notification_callback
+
+        self.reference = 15  # todo: random value
 
     def __str__(self):
         return "Bridge %s at %s" % (self.uuid, self.ip)
@@ -261,11 +262,36 @@ class Bridge(object):
 
         return cmd, msg
 
+    def ListRegisteredApps(self):
+        cmd = zehnder_pb2.GatewayOperation()
+        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('ListRegisteredAppsRequestType')
+        cmd.reference = self.reference
+
+        msg = zehnder_pb2.ListRegisteredAppsRequest()
+
+        # Send the message
+        self.reference += 1
+        self._send_message(cmd, msg)
+
+        # Read feedback
+        reply_cmd, reply_msg = self._read_message()
+
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
+
+        apps = []
+        for app in reply_msg.apps:
+            apps.append({
+                'uuid': app.uuid.hex(),
+                'devicename': app.devicename
+            })
+
+        return apps
+
     def RegisterApp(self, devicename, pin=0):
         cmd = zehnder_pb2.GatewayOperation()
         cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('RegisterAppRequestType')
         cmd.reference = self.reference
-        self.reference += 1
 
         msg = zehnder_pb2.RegisterAppRequest()
         msg.uuid = bytes.fromhex(self.local_uuid)
@@ -273,6 +299,7 @@ class Bridge(object):
         msg.devicename = devicename
 
         # Send the message
+        self.reference += 1
         self._send_message(cmd, msg)
 
         # Read feedback
@@ -281,6 +308,30 @@ class Bridge(object):
         # Check feedback
         if reply_cmd.result == zehnder_pb2.GatewayOperation.GatewayResult.Value('NOT_ALLOWED'):
             raise Exception('Access denied. Invalid PIN.')
+
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
+
+        return True
+
+    def DeregisterApp(self, uuid):
+        cmd = zehnder_pb2.GatewayOperation()
+        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('DeregisterAppRequestType')
+        cmd.reference = self.reference
+
+        msg = zehnder_pb2.DeregisterAppRequest()
+        msg.uuid = bytes.fromhex(uuid)
+
+        # Send the message
+        self.reference += 1
+        self._send_message(cmd, msg)
+
+        # Read feedback
+        reply_cmd, reply_msg = self._read_message()
+
+        # Check feedback
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
 
         return True
 
@@ -302,10 +353,10 @@ class Bridge(object):
         if reply_cmd.result == zehnder_pb2.GatewayOperation.GatewayResult.Value('NOT_ALLOWED'):
             raise Exception('Access denied. Your app is probably not registered.')
 
-        if reply_cmd.result == zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
-            return True
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
 
-        raise Exception('Unknown response')
+        return True
 
     def CloseSession(self):
         cmd = zehnder_pb2.GatewayOperation()
@@ -317,5 +368,51 @@ class Bridge(object):
 
         # Send the message
         self._send_message(cmd, msg)
+
+        return True
+
+    def CnRmiRequest(self, nodeId, message):
+        cmd = zehnder_pb2.GatewayOperation()
+        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('CnRmiRequestType')
+        cmd.reference = self.reference
+        self.reference += 1
+
+        msg = zehnder_pb2.CnRmiRequest()
+        msg.nodeId = nodeId
+        msg.message = message
+
+        # Send the message
+        self._send_message(cmd, msg)
+
+        # Read feedback
+        reply_cmd, reply_msg = self._read_message()
+
+        # Check feedback
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
+
+        return True
+
+    def CnRpdoRequest(self, pdid, zone, type, timeout = 4294967295):
+        cmd = zehnder_pb2.GatewayOperation()
+        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('CnRpdoRequestType')
+        cmd.reference = self.reference
+        self.reference += 1
+
+        msg = zehnder_pb2.CnRpdoRequest()
+        msg.pdid = pdid
+        msg.zone = zone
+        msg.type = type
+        msg.timeout = timeout
+
+        # Send the message
+        self._send_message(cmd, msg)
+
+        # Read feedback
+        reply_cmd, reply_msg = self._read_message()
+
+        # Check feedback
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
 
         return True

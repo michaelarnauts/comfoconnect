@@ -14,16 +14,13 @@ class BridgeDiscovery(object):
 
     def Discover(self):
 
-        # todo: find out about local broadcast address
-        discover_ip = "192.168.1.255"
-
         # Setup socket
         udpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         udpsocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         udpsocket.settimeout(2)
 
         # Send broadcast packet
-        udpsocket.sendto("\x0a\x00".encode(), (discover_ip, BRIDGE_PORT))
+        udpsocket.sendto("\x0a\x00".encode(), ('<broadcast>', BRIDGE_PORT))
 
         # Try to read response
         parser = zehnder_pb2.DiscoveryOperation()
@@ -36,9 +33,10 @@ class BridgeDiscovery(object):
                     parser.ParseFromString(data)
                     ip_address = parser.searchGatewayResponse.ipaddress
                     uuid = parser.searchGatewayResponse.uuid.hex()
+                    version = parser.searchGatewayResponse.version
 
                     # Create bridge objects
-                    bridge = Bridge(ip_address, uuid)
+                    bridge = Bridge(ip_address, uuid, version)
                     bridges.append(bridge)
 
             except socket.timeout:
@@ -194,15 +192,18 @@ class Bridge(object):
     ip = None
     uuid = None
     local_uuid = None
+    version = None
 
     socket = None
     reference = None
 
     notification_callback = None
 
-    def __init__(self, ip, uuid, notification_callback=None):
+    def __init__(self, ip, uuid, version=1, notification_callback=None):
         self.ip = ip
         self.uuid = uuid
+        self.version = version
+
         self.notification_callback = notification_callback
 
         self.reference = 15  # todo: random value
@@ -335,13 +336,15 @@ class Bridge(object):
 
         return True
 
-    def StartSession(self):
+    def StartSession(self, takeover=False):
         cmd = zehnder_pb2.GatewayOperation()
         cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('StartSessionRequestType')
         cmd.reference = self.reference
         self.reference += 1
 
         msg = zehnder_pb2.StartSessionRequest()
+        if takeover:
+            msg.takeover = 1
 
         # Send the message
         self._send_message(cmd, msg)
@@ -357,6 +360,51 @@ class Bridge(object):
             raise Exception('Unknown response')
 
         return True
+
+    def VersionRequest(self):
+        cmd = zehnder_pb2.GatewayOperation()
+        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('VersionRequestType')
+        cmd.reference = self.reference
+        self.reference += 1
+
+        msg = zehnder_pb2.VersionRequest()
+
+        # Send the message
+        self._send_message(cmd, msg)
+
+        # Read feedback
+        reply_cmd, reply_msg = self._read_message()
+
+        # Check feedback
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
+
+        return {
+            'gatewayVersion': reply_msg.gatewayVersion,
+            'serialNumber': reply_msg.serialNumber,
+            'comfoNetVersion': reply_msg.comfoNetVersion
+
+        }
+
+    def CnTimeRequest(self):
+        cmd = zehnder_pb2.GatewayOperation()
+        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('CnTimeRequestType')
+        cmd.reference = self.reference
+        self.reference += 1
+
+        msg = zehnder_pb2.CnTimeRequest()
+
+        # Send the message
+        self._send_message(cmd, msg)
+
+        # Read feedback
+        reply_cmd, reply_msg = self._read_message()
+
+        # Check feedback
+        if reply_cmd.result != zehnder_pb2.GatewayOperation.GatewayResult.Value('OK'):
+            raise Exception('Unknown response')
+
+        return reply_msg.currentTime
 
     def CloseSession(self):
         cmd = zehnder_pb2.GatewayOperation()
@@ -393,7 +441,7 @@ class Bridge(object):
 
         return True
 
-    def CnRpdoRequest(self, pdid, zone, type, timeout = 4294967295):
+    def CnRpdoRequest(self, pdid, zone, type, timeout=4294967295):
         cmd = zehnder_pb2.GatewayOperation()
         cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('CnRpdoRequestType')
         cmd.reference = self.reference

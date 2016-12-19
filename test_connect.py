@@ -28,11 +28,13 @@ except Exception as e:
     try:
         # Register with the bridge
         bridge.RegisterApp('Computer', 0)
-        print("Successfully registered")
 
     except Exception as e:
         print('Could not register. Invalid PIN!')
         exit(1)
+
+    # Start session
+    bridge.StartSession()
 
 # Read a notification message
 cmd, msg = bridge._read_message()
@@ -41,12 +43,17 @@ cmd, msg = bridge._read_message()
 cmd, msg = bridge._read_message()
 
 # List registered apps
-apps = bridge.ListRegisteredApps()
-print(apps)
+# apps = bridge.ListRegisteredApps()
+# print(apps)
 
-#bridge.DeregisterApp('a996190220044d68a07d85a2e3866fcd')
+# bridge.DeregisterApp('a996190220044d68a07d85a2e3866fcd')
+# bridge.DeregisterApp('a996190220044d68a07d85a2e3866fce')
 
-#bridge.DeregisterApp('a996190220044d68a07d85a2e3866fce')
+# version = bridge.VersionRequest()
+# print(version)
+
+# time = bridge.CnTimeRequest()
+# print(time)
 
 # Close session
 bridge.CloseSession()

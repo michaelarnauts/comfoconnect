@@ -80,7 +80,7 @@ class Bridge(object):
         try:
             # Connect to bridge
             tcpsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            tcpsocket.settimeout(5)
+            tcpsocket.settimeout(10)
             tcpsocket.connect((self.ip, 56747))
             self.socket = tcpsocket
 
@@ -108,22 +108,26 @@ class Bridge(object):
             raise PyComfoConnectError('Not connected!')
 
         # Read packet size
-        msg_len_buf = self.socket.recv(4)
-        msg_len = struct.unpack('>L', msg_len_buf)[0]
+        try:
+            msg_len_buf = self.socket.recv(4)
+            msg_len = struct.unpack('>L', msg_len_buf)[0]
 
-        # Read rest of packet
-        msg_buf = self.socket.recv(msg_len)
+            # Read rest of packet
+            msg_buf = self.socket.recv(msg_len)
+
+        except OSError:
+            return None
 
         # Extract headers
         message = Message.decode(msg_len_buf + msg_buf)
+
+        # Debug message
+        print("rx: %s" % message)
 
         # Check if the message is for us
         if message.dst != self.local_uuid:
             raise BaseException(
                 "Received message destination (%s) is not for us (%s)" % (message.dst.hex(), self.local_uuid.hex()))
-
-        # Debug message
-        print("rx: %s" % message)
 
         return message
 
@@ -144,7 +148,7 @@ class Bridge(object):
         # Read a message
         reply = self._read_message()
 
-        return True
+        return reply
 
     def CloseSession(self):
         cmd = zehnder_pb2.GatewayOperation()
@@ -162,7 +166,7 @@ class Bridge(object):
 
     def ListRegisteredApps(self):
         cmd = zehnder_pb2.GatewayOperation()
-        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('ListRegisteredAppsRequestType')
+        cmd.type = zehnder_pb2.GatewayOperation.ListRegisteredAppsRequestType
         cmd.reference = self.reference
         self.reference += 1
 
@@ -186,7 +190,7 @@ class Bridge(object):
 
     def RegisterApp(self, devicename, pin=0):
         cmd = zehnder_pb2.GatewayOperation()
-        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('RegisterAppRequestType')
+        cmd.type = zehnder_pb2.GatewayOperation.RegisterAppRequestType
         cmd.reference = self.reference
         self.reference += 1
 
@@ -196,17 +200,17 @@ class Bridge(object):
         msg.devicename = devicename
 
         # Send the message
-        message = Message(cmd, msg)
-        self._send_message(message.encode(self.local_uuid, self.uuid))
+        message = Message(cmd, msg, self.local_uuid, self.remote_uuid)
+        self._send_message(message)
 
         # Read feedback
         reply = self._read_message()
 
-        return True
+        return reply
 
     def DeregisterApp(self, uuid):
         cmd = zehnder_pb2.GatewayOperation()
-        cmd.type = zehnder_pb2.GatewayOperation.OperationType.Value('DeregisterAppRequestType')
+        cmd.type = zehnder_pb2.GatewayOperation.DeregisterAppRequestType
         cmd.reference = self.reference
         self.reference += 1
 

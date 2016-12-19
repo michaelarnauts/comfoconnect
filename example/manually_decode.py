@@ -39,6 +39,7 @@ while True:
         rmis[message.cmd.reference]['rx'] = message.msg.message
 
     if message.cmd.type == zehnder_pb2.GatewayOperation.CnRpdoRequestType:
+        print(message)
         if not message.msg.pdid in pdids:
             pdids[message.msg.pdid] = {}
         pdids[message.msg.pdid]['tx'] = [message.msg.zone, message.msg.type]
@@ -58,7 +59,7 @@ print("CnRpdoRequestType")
 for pdid in pdids:
     print(pdid, pdids[pdid])
 
-print("CnRmiRequestType")
-for rmi in rmis:
-    print(rmi, rmis[rmi])
+# print("CnRmiRequestType")
+# for rmi in rmis:
+#     print(rmi, rmis[rmi])
 

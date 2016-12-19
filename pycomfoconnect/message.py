@@ -113,6 +113,11 @@ class Message(object):
         cmd = zehnder_pb2.GatewayOperation()
         cmd.ParseFromString(cmd_buf)
 
+        # Parse message
+        cmd_type = cls.mapping.get(cmd.type)
+        msg = cmd_type()
+        msg.ParseFromString(msg_buf)
+
         # Check status code
         if cmd.result == zehnder_pb2.GatewayOperation.OK:
             pass
@@ -122,8 +127,8 @@ class Message(object):
             raise PyComfoConnectInternalError()
         elif cmd.result == zehnder_pb2.GatewayOperation.NOT_REACHABLE:
             raise PyComfoConnectNotReachable()
-        elif cmd.result == zehnder_pb2.GatewayOperation.CONNECT_OTHER_SESSION:
-            raise PyComfoConnectOtherSession()
+        elif cmd.result == zehnder_pb2.GatewayOperation.OTHER_SESSION:
+            raise PyComfoConnectOtherSession(msg.devicename)
         elif cmd.result == zehnder_pb2.GatewayOperation.NOT_ALLOWED:
             raise PyComfoConnectNotAllowed()
         elif cmd.result == zehnder_pb2.GatewayOperation.NO_RESOURCES:
@@ -132,11 +137,6 @@ class Message(object):
             raise PyComfoConnectNotExists()
         elif cmd.result == zehnder_pb2.GatewayOperation.RMI_ERROR:
             raise PyComfoConnectRmiError()
-
-        # Parse message
-        cmd_type = cls.mapping.get(cmd.type)
-        msg = cmd_type()
-        msg.ParseFromString(msg_buf)
 
         return Message(cmd, msg, src_buf, dst_buf)
 

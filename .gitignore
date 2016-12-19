@@ -1,2 +1,10 @@
+# IDE
 .idea/
-__pycache__/
+
+# Temporary files
+*.pyc
+*.pyo
+
+# Build-related files
+/*.egg-info
+/dist/

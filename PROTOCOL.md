@@ -7,9 +7,9 @@ issue or making a PR.**
 
 ## General packet structure
 The messages are send in a TCP-connection to port 56747, and are prepended with a header that resembles the
-"Lenght-prefix protocol buffers" format.
+"Length-prefix protocol buffers" format.
 
-This file [zehnder.proto](protobuf/zehnder.proto) contains a structured description of the protocol.
+This file [zehnder.proto](protobuf/zehnder.proto) contains a Protocol Buffers definition of the protocol.
 
 ## Manually decoding a packet
 The `protoc` utility can be used to manually decode a message based on the hex representation of the payload. You need
@@ -77,7 +77,7 @@ indicates the length of the `op` field, the rest of the data contains the `msg`.
 | length (32 bit)       | `0x0000004f`                         | Length of the whole message excluding this field      |
 | src (12 bytes)        | `0xaf154804169043898d2da77148f886be` |                                                       |
 | dst (12 bytes)        | `0x0000000000251010800170b3d54264b4` |                                                       |
-| oplength (16 bit)     | `0x0004`                             | Length of the `op` message                            | 
+| op_length (16 bit     | `0x0004`                             | Length of the `op` message                            |
 | op (variable length)  | `0x08342002`                         | Message with type `GatewayOperation`                  |
 | msg (variable length) | `...`                                | Message with type that is stated in `op.type`         |
 
@@ -202,6 +202,21 @@ zoneId: 255
 mode: NODE_NORMAL
 ```
 
+These are the known `productId`s.
+
+| productId | type           | description                                                                             |
+|-----------|----------------|-----------------------------------------------------------------------------------------|
+| 1         | ComfoAirQ      | The ComfoAirQ ventilation unit.                                                         |
+| 2         | ComfoSense     | ComfoSense C                                                                            |
+| 3         | ComfoSwitch    | ComfoSwitch C                                                                           |
+| 4         | OptionBox      |                                                                                         |
+| 5         | ZehnderGateway | ComfoConnect LAN C                                                                      |
+| 6         | ComfoCool      | ComfoCool Q600                                                                          |
+| 7         | KNXGateway     | ComfoConnect KNX C                                                                      |
+| 8         | Service Tool   |                                                                                         |
+| 9         | PT Tool        | Production test tool                                                                    |
+| 10        | DVT Tool       | Design verification test tool                                                           |
+
 #### CloseSession (`CloseSessionRequestType`)
 The client logs out by sending a `type: CloseSessionRequestType`. The bridge doesn't seem to send a response on 
 this.
@@ -288,8 +303,8 @@ Overview of known pdids:
 | 176  | 1    | *Unknown* (`00`) |
 | 208  | 1    | *Unknown* (`00`) |
 | 209  | 6    | *Unknown* (`4700` = 71 ) |
-| 210  | 0    | *Unknown* (`00`) |
-| 211  | 0    | *Unknown* (`00`) |
+| 210  | 0    | *Unknown* (`00` = false) |
+| 211  | 0    | *Unknown* (`00` = false) |
 | 212  | 6    | *Unknown* (`ee00` = 238) |
 | 216  | 2    | *Unknown* (`0000`) |
 | 217  | 2    | *Unknown* (`0000`) |
@@ -310,17 +325,32 @@ Overview of known pdids:
 | 371  | 1    | *Unknown* (`00`) |
 | 372  | 1    | *Unknown* (`00`) |
 | 384  | 6    | *Unknown* (`0000`) |
-| 386  | 0    | *Unknown* (`00`) |
+| 386  | 0    | *Unknown* (`00` = false) |
 | 400  | 6    | *Unknown* (`0000`) |
 | 401  | 1    | *Unknown* (`00`) |
-| 402  | 0    | *Unknown* (`00`) |
+| 402  | 0    | *Unknown* (`00` = false) |
 | 416  | 6    | *Unknown* (`70fe` = -400) |
 | 417  | 6    | *Unknown* (`6400` = 100) |
 | 418  | 1    | *Unknown* (`00`) |
-| 419  | 0    | *Unknown* (`00`) |
+| 419  | 0    | *Unknown* (`00` = false) |
+
+Overview of the types:
+
+| type | description |
+|------|-------------|
+| 0    | CN_BOOL     |
+| 1    | CN_UINT8    |
+| 2    | CN_UINT16   |
+| 3    | CN_UINT32   |
+| 5    | CN_INT8     |
+| 6    | CN_INT16    |
+| 9    | CN_STRING   |
+| 10   | CN_TIME     |
+| 11   | CN_VERSION  |
 
 #### CnRmiRequest (`CnRmiRequestType` and `CnRmiResponseType`)
-You can execute a function on the device by invoking a `type: CnRmiRequestType`. You need to specify the `nodeId` and a `message`.
+You can execute a function on the device by invoking a `type: CnRmiRequestType`. You need to specify the `nodeId` and a
+`message`.
 
 ```javascript
 type: CnRmiRequestType
@@ -342,19 +372,18 @@ Overview of known CnRmiRequests:
 
 | Request                | Response                                                   | Description                    |
 |------------------------|------------------------------------------------------------|--------------------------------|
+| `0101011008`           | `ComfoAir Q450 B R RF ST Quality\x00`                      | HRU Type                       |
+| `010101100b`           | `471502004\x00`                                            | *Unknown*                      |
+| `0117011002`           | `\x01`                                                     | *Unknown*                      |
+| `0117021002`           | `\x00`                                                     | *Unknown*                      |
+| `0120011006`           | `\x00`                                                     | *Unknown*                      | 
+| `012401100b`           | `\x00`                                                     | *Unknown*                      |
+| `0125001003`           | `\x00`                                                     | *Unknown*                      |
 | `02010101150304060507` | `\x02BEA004185031910\x00\x00\x10\x10\xc0\x02\x00T\x10@`    | *Unknown*                      |
 | `80150101`             | `\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01`        | *Unknown*                      |
 | `83150101`             | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01` | *Unknown*                      |
 | `83150102`             | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03` | *Unknown*                      |
 | `83150105`             | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01` | *Unknown*                      |
+| `861501`               | `\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x02\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
 | `871501`               | `\x0b\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03\x00\x00\x00\x00\x00 \x1c\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00 \x1c\x00\x00\x00\x00\x00\x00\x01\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\xb0\x04\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
 | `871505`               | `\x01\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x01` | *Unknown*                  |
-| `0117011002`           | `\x01`                                                     | *Unknown*                      |
-| `0117021002`           | `\x00`                                                     | *Unknown*                      |
-| `010101100b`           | `471502004\x00`                                            | *Unknown*                      |
-| `012401100b`           | `\x00`                                                     | *Unknown*                      |
-| `0125001003`           | `\x00`                                                     | *Unknown*                      |
-| `0120011006`           | `\x00`                                                     | *Unknown*                      | 
-| `861501`               | `\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x02\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
-| `0120011006`           | `\x00`                                                     | *Unknown*                      |
-| `0101011008`           | `ComfoAir Q450 B R RF ST Quality\x00`                      | HRU Type                       |

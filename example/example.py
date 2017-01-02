@@ -132,16 +132,16 @@ message = bridge._read_message()
 # bridge.CnRpdoRequest(87, 1, 3) # ffffffff
 # bridge.CnRpdoRequest(176, 1, 1) # 00
 # bridge.CnRpdoRequest(208, 1, 1) # 00
-# bridge.CnRpdoRequest(209, 1, 6) # 4700
-# bridge.CnRpdoRequest(212, 1, 6) # ee00
-# bridge.CnRpdoRequest(213, 1, 6) # ee00
-# bridge.CnRpdoRequest(221, 1, 6) # ac00
+bridge.CnRpdoRequest(209, 1, 6) # 4700
+bridge.CnRpdoRequest(212, 1, 6) # ee00
+bridge.CnRpdoRequest(213, 1, 6) # ee00
+bridge.CnRpdoRequest(221, 1, 6) # ac00
 # bridge.CnRpdoRequest(224, 1, 1) # 03
 # bridge.CnRpdoRequest(225, 1, 1) # 01
-# bridge.CnRpdoRequest(226, 1, 2) # 6400
-# bridge.CnRpdoRequest(276, 1, 6) # 4300
-# bridge.CnRpdoRequest(321, 1, 2) # 0700
-# bridge.CnRpdoRequest(325, 1, 2) # 0100
+bridge.CnRpdoRequest(226, 1, 2) # 6400
+bridge.CnRpdoRequest(276, 1, 6) # 4300
+bridge.CnRpdoRequest(321, 1, 2) # 0700
+bridge.CnRpdoRequest(325, 1, 2) # 0100
 # bridge.CnRpdoRequest(337, 1, 3) # 26000000
 # bridge.CnRpdoRequest(338, 1, 3) # 00000000
 # bridge.CnRpdoRequest(341, 1, 3) # 00000000

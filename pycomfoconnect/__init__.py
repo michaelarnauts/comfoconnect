@@ -7,14 +7,9 @@ from .zehnder_pb2 import *
 from .message import *
 from .error import *
 
-__all__ = (
-    '__version__', '__version_info__', 'get_chromecasts', 'Chromecast',
-)
-__version_info__ = ('0', '7', '6')
-__version__ = '.'.join(__version_info__)
-
 import socket
 import struct
+
 
 
 class Bridge(object):

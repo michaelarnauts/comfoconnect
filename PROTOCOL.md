@@ -282,6 +282,7 @@ Overview of known pdids:
 | 291  | 1    | Temperature & Humidity: Exhaust Air (`57` = 87%) |
 | 292  | 1    | Temperature & Humidity: Outdoor Air (`43` = 67%) |
 | 294  | 1    | Temperature & Humidity: Supply Air (`23` = 35%) |
+|
 | 16   | 1    | *Unknown* (`01`) |
 | 33   | 1    | *Unknown* (`01`) |
 | 37   | 1    | *Unknown* (`00`) |
@@ -370,20 +371,30 @@ message: "ComfoAir Q450 B R RF ST Quality\000"
 
 Overview of known CnRmiRequests:
 
-| Request                | Response                                                   | Description                    |
-|------------------------|------------------------------------------------------------|--------------------------------|
-| `0101011008`           | `ComfoAir Q450 B R RF ST Quality\x00`                      | HRU Type                       |
-| `010101100b`           | `471502004\x00`                                            | *Unknown*                      |
-| `0117011002`           | `\x01`                                                     | *Unknown*                      |
-| `0117021002`           | `\x00`                                                     | *Unknown*                      |
-| `0120011006`           | `\x00`                                                     | *Unknown*                      | 
-| `012401100b`           | `\x00`                                                     | *Unknown*                      |
-| `0125001003`           | `\x00`                                                     | *Unknown*                      |
-| `02010101150304060507` | `\x02BEA004185031910\x00\x00\x10\x10\xc0\x02\x00T\x10@`    | *Unknown*                      |
-| `80150101`             | `\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01`        | *Unknown*                      |
-| `83150101`             | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01` | *Unknown*                      |
-| `83150102`             | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03` | *Unknown*                      |
-| `83150105`             | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01` | *Unknown*                      |
-| `861501`               | `\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x02\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
-| `871501`               | `\x0b\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03\x00\x00\x00\x00\x00 \x1c\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00 \x1c\x00\x00\x00\x00\x00\x00\x01\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\xb0\x04\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
-| `871505`               | `\x01\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x01` | *Unknown*                  |
+The request and response seems to be in little endian format (eg. `0x5802` => `0x258` => 600)
+
+| Request                      | Response                                                   | Description              |
+|------------------------------|------------------------------------------------------------|--------------------------|
+| `0101 0110 08`               | `ComfoAir Q450 B R RF ST Quality\x00`                      | Get HRU Type             |
+| `8415 0101 0000 0000 0100 0000 00` | *Empty*                                              | Switch to away mode      |
+| `8415 0101 0000 0000 0100 0000 01` | *Empty*                                              | Switch to fan speed 1    |
+| `8415 0101 0000 0000 0100 0000 02` | *Empty*                                              | Switch to fan speed 2    |
+| `8415 0101 0000 0000 0100 0000 03` | *Empty*                                              | Switch to fan speed 3    |
+| `8415 0106 0000 0000 5802 0000 03` | *Empty*                                              | Start boost mode for 10m (= 600 seconds = `0x0258`) |
+| `8515 0106`                  | *Empty*                                                    | End boost mode           |
+| `8515 0801`                  | *Empty*                                                    | Switch to auto mode      |
+|
+| `8315 0105`                  | `0100 0000 00ff ffff ffff ffff ff00`                       | Switch to manual mode, but needs more commands |
+| `0101 0110 0b`               | `471502004\x00`                                            | *Unknown*                |
+| `0117 0110 02`               | `\x01`                                                     | *Unknown*                |
+| `0117 0210 02`               | `\x00`                                                     | *Unknown*                |
+| `0120 0110 06`               | `\x00`                                                     | *Unknown*                |
+| `0124 0110 0b`               | `\x00`                                                     | *Unknown*                |
+| `0125 0010 03`               | `\x00`                                                     | *Unknown*                |
+| `0201 0101 1503 0406 0507`   | `\x02BEA004185031910\x00\x00\x10\x10\xc0\x02\x00T\x10@`    | *Unknown*                |
+| `8015 0101`                  | `\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01`        | *Unknown*                |
+| `8315 0101`                  | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01` | *Unknown*                |
+| `8315 0102`                  | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03` | *Unknown*                |
+| `8615 01`                    | `\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x02\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
+| `8715 01`                    | `\x0b\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03\x00\x00\x00\x00\x00 \x1c\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00 \x1c\x00\x00\x00\x00\x00\x00\x01\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00X\x02\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\xb0\x04\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
+| `8715 05`                    | `\x01\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x01` | *Unknown*            |

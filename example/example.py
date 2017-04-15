@@ -34,10 +34,16 @@ if bridge is None:
     exit(1)
 print("Bridge found: %s (%s)" % (bridge.remote_uuid.hex(), bridge.ip))
 
+## Setting up a callback function ######################################################################################
+
+def callback(message):
+    print(message)
+    return
+
 ## Setting up a session ################################################################################################
 
 # Connect to the bridge
-bridge.connect(bytes.fromhex(args.my_uuid))
+bridge.connect(bytes.fromhex(args.my_uuid), callback)
 
 try:
     message = bridge.StartSession(takeover=True)
@@ -62,12 +68,6 @@ except PyComfoConnectNotAllowed:
     # Start session
     bridge.StartSession()
 
-# Read a notification message
-message = bridge._read_message()
-
-# Read a notification message
-message = bridge._read_message()
-
 ## Executing commands ##################################################################################################
 
 # ListRegisteredApps
@@ -91,11 +91,14 @@ message = bridge._read_message()
 
 # bridge.CnRmiRequest(1, bytes.fromhex('85150801')) # Go to auto mode
 # bridge.CnRmiRequest(1, bytes.fromhex('84150101000000000100000001')) # Set fan speed to 1
+# bridge.CnRmiRequest(1, bytes.fromhex('84150101000000000100000002')) # Set fan speed to 2
+# bridge.CnRmiRequest(1, bytes.fromhex('84150101000000000100000003')) # Set fan speed to 3
 
-## Reading sensors #@@@#################################################################################################
+## Reading sensors #####################################################################################################
 
 # CnRpdoRequest
-bridge.CnRpdoRequest(65, 1, 1) # Fans: Fan speed setting
+# bridge.CnRpdoRequest(81, 1, 3) # General: Countdown until next fan speed change
+# bridge.CnRpdoRequest(65, 1, 1) # Fans: Fan speed setting
 # bridge.CnRpdoRequest(117, 1, 1) # Fans: Supply fan duty
 # bridge.CnRpdoRequest(118, 1, 1) # Fans: Exhaust fan duty
 # bridge.CnRpdoRequest(119, 1, 2) # Fans: Supply fan flow
@@ -125,12 +128,10 @@ bridge.CnRpdoRequest(65, 1, 1) # Fans: Fan speed setting
 # bridge.CnRpdoRequest(49, 1, 1) # 01
 # bridge.CnRpdoRequest(53, 1, 1) # ff
 # bridge.CnRpdoRequest(56, 1, 1) # 01
-# bridge.CnRpdoRequest(65, 1, 1) # 01
 # bridge.CnRpdoRequest(66, 1, 1) # 00
 # bridge.CnRpdoRequest(67, 1, 1) # 02 or 00
 # bridge.CnRpdoRequest(70, 1, 1) # 00
 # bridge.CnRpdoRequest(71, 1, 1) # 00
-# bridge.CnRpdoRequest(81, 1, 3) # ffffffff
 # bridge.CnRpdoRequest(82, 1, 3) # ffffffff
 # bridge.CnRpdoRequest(85, 1, 3) # ffffffff
 # bridge.CnRpdoRequest(86, 1, 3) # ffffffff
@@ -139,12 +140,10 @@ bridge.CnRpdoRequest(65, 1, 1) # Fans: Fan speed setting
 # bridge.CnRpdoRequest(208, 1, 1) # 00
 # bridge.CnRpdoRequest(209, 1, 6) # 4700
 # bridge.CnRpdoRequest(212, 1, 6) # ee00
-# bridge.CnRpdoRequest(213, 1, 6) # ee00
 # bridge.CnRpdoRequest(221, 1, 6) # ac00
 # bridge.CnRpdoRequest(224, 1, 1) # 03
 # bridge.CnRpdoRequest(225, 1, 1) # 01
 # bridge.CnRpdoRequest(226, 1, 2) # 6400
-# bridge.CnRpdoRequest(276, 1, 6) # 4300
 # bridge.CnRpdoRequest(321, 1, 2) # 0700
 # bridge.CnRpdoRequest(325, 1, 2) # 0100
 # bridge.CnRpdoRequest(337, 1, 3) # 26000000
@@ -158,7 +157,7 @@ bridge.CnRpdoRequest(65, 1, 1) # Fans: Fan speed setting
 # bridge.CnRpdoRequest(402, 1, 0) # 00
 # bridge.CnRpdoRequest(419, 1, 0) # 00
 
-# Read 50 messages
+# Read messages
 while True:
     message = bridge._read_message()
     if message is not None and message.cmd.type == zehnder_pb2.GatewayOperation.CnRpdoNotificationType:
@@ -168,7 +167,7 @@ while True:
         if len(data) == 4:
             print("%s = %s (%s)" % (message.msg.pdid, data, struct.unpack('h', message.msg.data)[0]))
         if len(data) == 8:
-            print("%s = %s (%s)" % (message.msg.pdid, data))
+            print("%s = %s" % (message.msg.pdid, data))
 
 ## Closing the session #@###############################################################################################
 

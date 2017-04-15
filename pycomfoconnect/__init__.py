@@ -1,5 +1,5 @@
 """
-PyComfoConnect: manage your Zehnder ComfoConnect Q350/Q450/Q650 ventilation unit
+PyComfoConnect: Manage your Zehnder ComfoConnect Q350/Q450/Q650 ventilation unit
 """
 from __future__ import print_function
 
@@ -11,22 +11,23 @@ import socket
 import struct
 
 
-
 class Bridge(object):
     local_uuid = None
     ip = None
     remote_uuid = None
     version = None
+    debug = None
 
     socket = None
     reference = None
 
     notification_callback = None
 
-    def __init__(self, ip, remote_uuid, version=1):
+    def __init__(self, ip, remote_uuid, version=1, debug=False):
         self.ip = ip
         self.remote_uuid = remote_uuid
         self.version = version
+        self.debug = debug
 
         self.reference = 15  # todo: random value
 
@@ -68,7 +69,7 @@ class Bridge(object):
         # Return found bridges
         return bridges
 
-    def connect(self, local_uuid, notification_callback=None):
+    def connect(self, local_uuid, notification_callback):
         self.local_uuid = local_uuid
         self.notification_callback = notification_callback
 
@@ -94,7 +95,8 @@ class Bridge(object):
         self.socket.sendall(packet)
 
         # Debug message
-        print("tx: %s" % message)
+        if self.debug:
+            print("tx: %s" % message)
 
         return True
 
@@ -105,6 +107,9 @@ class Bridge(object):
         # Read packet size
         try:
             msg_len_buf = self.socket.recv(4)
+            if not msg_len_buf:
+                raise PyComfoConnectError('Disconnected.')
+
             msg_len = struct.unpack('>L', msg_len_buf)[0]
 
             # Read rest of packet
@@ -117,7 +122,8 @@ class Bridge(object):
         message = Message.decode(msg_len_buf + msg_buf)
 
         # Debug message
-        print("rx: %s" % message)
+        if self.debug:
+            print("rx: %s" % message)
 
         # Check if the message is for us
         if message.dst != self.local_uuid:
@@ -142,6 +148,14 @@ class Bridge(object):
 
         # Read a message
         reply = self._read_message()
+
+        # Read a notification message
+        message = self._read_message()
+        self.notification_callback(message)
+
+        # Read a notification message
+        message = self._read_message()
+        self.notification_callback(message)
 
         return reply
 
@@ -277,7 +291,7 @@ class Bridge(object):
         # Read feedback
         reply = self._read_message()
 
-        return True
+        return reply
 
     def CnRpdoRequest(self, pdid, zone, type, timeout=None):
         cmd = zehnder_pb2.GatewayOperation()

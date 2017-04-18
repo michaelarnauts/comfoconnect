@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 long_description = open('README.rst').read()
 
 setup(
-    name='PyComfoConnect',
+    name='pycomfoconnect',
     version='0.1',
     license='GPL',
     url='https://github.com/michaelarnauts/comfoconnect',

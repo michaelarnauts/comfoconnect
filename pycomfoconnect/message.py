@@ -1,4 +1,5 @@
 import struct
+
 from . import zehnder_pb2
 from .error import *
 
@@ -70,11 +71,6 @@ class Message(object):
         zehnder_pb2.GatewayOperation.CnFupResetRequestType: zehnder_pb2.CnFupResetRequest,
         zehnder_pb2.GatewayOperation.CnFupResetConfirmType: zehnder_pb2.CnFupResetConfirm,
     }
-
-    src = None
-    dst = None
-    cmd = None
-    msg = None
 
     def __init__(self, cmd, msg, src, dst):
         self.cmd = cmd

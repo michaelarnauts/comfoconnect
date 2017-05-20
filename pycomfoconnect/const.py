@@ -38,30 +38,4 @@ SENSOR_AVOIDED_HEATING_TOTAL_YEAR = 214
 SENSOR_AVOIDED_HEATING_TOTAL = 215
 SENSOR_DAYS_TO_REPLACE_FILTER = 192
 
-# Sensor variable size
 
-SIZE_MAP = {
-    65: 1,
-    81: 3,
-    117: 1,
-    118: 1,
-    119: 2,
-    120: 2,
-    121: 2,
-    122: 2,
-    128: 2,
-    129: 2,
-    130: 2,
-    192: 2,
-    213: 2,
-    214: 2,
-    215: 2,
-    221: 6,
-    274: 6,
-    275: 6,
-    276: 6,
-    290: 1,
-    291: 1,
-    292: 1,
-    294: 1,
-}

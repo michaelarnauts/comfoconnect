@@ -1,75 +1,173 @@
 import struct
 
-from . import zehnder_pb2
 from .error import *
+from .zehnder_pb2 import *
 
 
 class Message(object):
-    mapping = {
-        zehnder_pb2.GatewayOperation.SetAddressRequestType: zehnder_pb2.SetAddressRequest,
-        zehnder_pb2.GatewayOperation.RegisterAppRequestType: zehnder_pb2.RegisterAppRequest,
-        zehnder_pb2.GatewayOperation.StartSessionRequestType: zehnder_pb2.StartSessionRequest,
-        zehnder_pb2.GatewayOperation.CloseSessionRequestType: zehnder_pb2.CloseSessionRequest,
-        zehnder_pb2.GatewayOperation.ListRegisteredAppsRequestType: zehnder_pb2.ListRegisteredAppsRequest,
-        zehnder_pb2.GatewayOperation.DeregisterAppRequestType: zehnder_pb2.DeregisterAppRequest,
-        zehnder_pb2.GatewayOperation.ChangePinRequestType: zehnder_pb2.ChangePinRequest,
-        zehnder_pb2.GatewayOperation.GetRemoteAccessIdRequestType: zehnder_pb2.GetRemoteAccessIdRequest,
-        zehnder_pb2.GatewayOperation.SetRemoteAccessIdRequestType: zehnder_pb2.SetRemoteAccessIdRequest,
-        zehnder_pb2.GatewayOperation.GetSupportIdRequestType: zehnder_pb2.GetSupportIdRequest,
-        zehnder_pb2.GatewayOperation.SetSupportIdRequestType: zehnder_pb2.SetSupportIdRequest,
-        zehnder_pb2.GatewayOperation.GetWebIdRequestType: zehnder_pb2.GetWebIdRequest,
-        zehnder_pb2.GatewayOperation.SetWebIdRequestType: zehnder_pb2.SetWebIdRequest,
-        zehnder_pb2.GatewayOperation.SetPushIdRequestType: zehnder_pb2.SetPushIdRequest,
-        zehnder_pb2.GatewayOperation.DebugRequestType: zehnder_pb2.DebugRequest,
-        zehnder_pb2.GatewayOperation.UpgradeRequestType: zehnder_pb2.UpgradeRequest,
-        zehnder_pb2.GatewayOperation.SetDeviceSettingsRequestType: zehnder_pb2.SetDeviceSettingsRequest,
-        zehnder_pb2.GatewayOperation.VersionRequestType: zehnder_pb2.VersionRequest,
-        zehnder_pb2.GatewayOperation.SetAddressConfirmType: zehnder_pb2.SetAddressConfirm,
-        zehnder_pb2.GatewayOperation.RegisterAppConfirmType: zehnder_pb2.RegisterAppConfirm,
-        zehnder_pb2.GatewayOperation.StartSessionConfirmType: zehnder_pb2.StartSessionConfirm,
-        zehnder_pb2.GatewayOperation.CloseSessionConfirmType: zehnder_pb2.CloseSessionConfirm,
-        zehnder_pb2.GatewayOperation.ListRegisteredAppsConfirmType: zehnder_pb2.ListRegisteredAppsConfirm,
-        zehnder_pb2.GatewayOperation.DeregisterAppConfirmType: zehnder_pb2.DeregisterAppConfirm,
-        zehnder_pb2.GatewayOperation.ChangePinConfirmType: zehnder_pb2.ChangePinConfirm,
-        zehnder_pb2.GatewayOperation.GetRemoteAccessIdConfirmType: zehnder_pb2.GetRemoteAccessIdConfirm,
-        zehnder_pb2.GatewayOperation.SetRemoteAccessIdConfirmType: zehnder_pb2.SetRemoteAccessIdConfirm,
-        zehnder_pb2.GatewayOperation.GetSupportIdConfirmType: zehnder_pb2.GetSupportIdConfirm,
-        zehnder_pb2.GatewayOperation.SetSupportIdConfirmType: zehnder_pb2.SetSupportIdConfirm,
-        zehnder_pb2.GatewayOperation.GetWebIdConfirmType: zehnder_pb2.GetWebIdConfirm,
-        zehnder_pb2.GatewayOperation.SetWebIdConfirmType: zehnder_pb2.SetWebIdConfirm,
-        zehnder_pb2.GatewayOperation.SetPushIdConfirmType: zehnder_pb2.SetPushIdConfirm,
-        zehnder_pb2.GatewayOperation.DebugConfirmType: zehnder_pb2.DebugConfirm,
-        zehnder_pb2.GatewayOperation.UpgradeConfirmType: zehnder_pb2.UpgradeConfirm,
-        zehnder_pb2.GatewayOperation.SetDeviceSettingsConfirmType: zehnder_pb2.SetDeviceSettingsConfirm,
-        zehnder_pb2.GatewayOperation.VersionConfirmType: zehnder_pb2.VersionConfirm,
-        zehnder_pb2.GatewayOperation.GatewayNotificationType: zehnder_pb2.GatewayNotification,
-        zehnder_pb2.GatewayOperation.KeepAliveType: zehnder_pb2.KeepAlive,
-        zehnder_pb2.GatewayOperation.FactoryResetType: zehnder_pb2.FactoryReset,
-        zehnder_pb2.GatewayOperation.CnTimeRequestType: zehnder_pb2.CnTimeRequest,
-        zehnder_pb2.GatewayOperation.CnTimeConfirmType: zehnder_pb2.CnTimeConfirm,
-        zehnder_pb2.GatewayOperation.CnNodeRequestType: zehnder_pb2.CnNodeRequest,
-        zehnder_pb2.GatewayOperation.CnNodeNotificationType: zehnder_pb2.CnNodeNotification,
-        zehnder_pb2.GatewayOperation.CnRmiRequestType: zehnder_pb2.CnRmiRequest,
-        zehnder_pb2.GatewayOperation.CnRmiResponseType: zehnder_pb2.CnRmiResponse,
-        zehnder_pb2.GatewayOperation.CnRmiAsyncRequestType: zehnder_pb2.CnRmiAsyncRequest,
-        zehnder_pb2.GatewayOperation.CnRmiAsyncConfirmType: zehnder_pb2.CnRmiAsyncConfirm,
-        zehnder_pb2.GatewayOperation.CnRmiAsyncResponseType: zehnder_pb2.CnRmiAsyncResponse,
-        zehnder_pb2.GatewayOperation.CnRpdoRequestType: zehnder_pb2.CnRpdoRequest,
-        zehnder_pb2.GatewayOperation.CnRpdoConfirmType: zehnder_pb2.CnRpdoConfirm,
-        zehnder_pb2.GatewayOperation.CnRpdoNotificationType: zehnder_pb2.CnRpdoNotification,
-        zehnder_pb2.GatewayOperation.CnAlarmNotificationType: zehnder_pb2.CnAlarmNotification,
-        zehnder_pb2.GatewayOperation.CnFupReadRegisterRequestType: zehnder_pb2.CnFupReadRegisterRequest,
-        zehnder_pb2.GatewayOperation.CnFupReadRegisterConfirmType: zehnder_pb2.CnFupReadRegisterConfirm,
-        zehnder_pb2.GatewayOperation.CnFupProgramBeginRequestType: zehnder_pb2.CnFupProgramBeginRequest,
-        zehnder_pb2.GatewayOperation.CnFupProgramBeginConfirmType: zehnder_pb2.CnFupProgramBeginConfirm,
-        zehnder_pb2.GatewayOperation.CnFupProgramRequestType: zehnder_pb2.CnFupProgramRequest,
-        zehnder_pb2.GatewayOperation.CnFupProgramConfirmType: zehnder_pb2.CnFupProgramConfirm,
-        zehnder_pb2.GatewayOperation.CnFupProgramEndRequestType: zehnder_pb2.CnFupProgramEndRequest,
-        zehnder_pb2.GatewayOperation.CnFupProgramEndConfirmType: zehnder_pb2.CnFupProgramEndConfirm,
-        zehnder_pb2.GatewayOperation.CnFupReadRequestType: zehnder_pb2.CnFupReadRequest,
-        zehnder_pb2.GatewayOperation.CnFupReadConfirmType: zehnder_pb2.CnFupReadConfirm,
-        zehnder_pb2.GatewayOperation.CnFupResetRequestType: zehnder_pb2.CnFupResetRequest,
-        zehnder_pb2.GatewayOperation.CnFupResetConfirmType: zehnder_pb2.CnFupResetConfirm,
+    class_to_type = {
+        SetAddressRequest: GatewayOperation.SetAddressRequestType,
+        RegisterAppRequest: GatewayOperation.RegisterAppRequestType,
+        StartSessionRequest: GatewayOperation.StartSessionRequestType,
+        CloseSessionRequest: GatewayOperation.CloseSessionRequestType,
+        ListRegisteredAppsRequest: GatewayOperation.ListRegisteredAppsRequestType,
+        DeregisterAppRequest: GatewayOperation.DeregisterAppRequestType,
+        ChangePinRequest: GatewayOperation.ChangePinRequestType,
+        GetRemoteAccessIdRequest: GatewayOperation.GetRemoteAccessIdRequestType,
+        SetRemoteAccessIdRequest: GatewayOperation.SetRemoteAccessIdRequestType,
+        GetSupportIdRequest: GatewayOperation.GetSupportIdRequestType,
+        SetSupportIdRequest: GatewayOperation.SetSupportIdRequestType,
+        GetWebIdRequest: GatewayOperation.GetWebIdRequestType,
+        SetWebIdRequest: GatewayOperation.SetWebIdRequestType,
+        SetPushIdRequest: GatewayOperation.SetPushIdRequestType,
+        DebugRequest: GatewayOperation.DebugRequestType,
+        UpgradeRequest: GatewayOperation.UpgradeRequestType,
+        SetDeviceSettingsRequest: GatewayOperation.SetDeviceSettingsRequestType,
+        VersionRequest: GatewayOperation.VersionRequestType,
+        SetAddressConfirm: GatewayOperation.SetAddressConfirmType,
+        RegisterAppConfirm: GatewayOperation.RegisterAppConfirmType,
+        StartSessionConfirm: GatewayOperation.StartSessionConfirmType,
+        CloseSessionConfirm: GatewayOperation.CloseSessionConfirmType,
+        ListRegisteredAppsConfirm: GatewayOperation.ListRegisteredAppsConfirmType,
+        DeregisterAppConfirm: GatewayOperation.DeregisterAppConfirmType,
+        ChangePinConfirm: GatewayOperation.ChangePinConfirmType,
+        GetRemoteAccessIdConfirm: GatewayOperation.GetRemoteAccessIdConfirmType,
+        SetRemoteAccessIdConfirm: GatewayOperation.SetRemoteAccessIdConfirmType,
+        GetSupportIdConfirm: GatewayOperation.GetSupportIdConfirmType,
+        SetSupportIdConfirm: GatewayOperation.SetSupportIdConfirmType,
+        GetWebIdConfirm: GatewayOperation.GetWebIdConfirmType,
+        SetWebIdConfirm: GatewayOperation.SetWebIdConfirmType,
+        SetPushIdConfirm: GatewayOperation.SetPushIdConfirmType,
+        DebugConfirm: GatewayOperation.DebugConfirmType,
+        UpgradeConfirm: GatewayOperation.UpgradeConfirmType,
+        SetDeviceSettingsConfirm: GatewayOperation.SetDeviceSettingsConfirmType,
+        VersionConfirm: GatewayOperation.VersionConfirmType,
+        GatewayNotification: GatewayOperation.GatewayNotificationType,
+        KeepAlive: GatewayOperation.KeepAliveType,
+        FactoryReset: GatewayOperation.FactoryResetType,
+        CnTimeRequest: GatewayOperation.CnTimeRequestType,
+        CnTimeConfirm: GatewayOperation.CnTimeConfirmType,
+        CnNodeRequest: GatewayOperation.CnNodeRequestType,
+        CnNodeNotification: GatewayOperation.CnNodeNotificationType,
+        CnRmiRequest: GatewayOperation.CnRmiRequestType,
+        CnRmiResponse: GatewayOperation.CnRmiResponseType,
+        CnRmiAsyncRequest: GatewayOperation.CnRmiAsyncRequestType,
+        CnRmiAsyncConfirm: GatewayOperation.CnRmiAsyncConfirmType,
+        CnRmiAsyncResponse: GatewayOperation.CnRmiAsyncResponseType,
+        CnRpdoRequest: GatewayOperation.CnRpdoRequestType,
+        CnRpdoConfirm: GatewayOperation.CnRpdoConfirmType,
+        CnRpdoNotification: GatewayOperation.CnRpdoNotificationType,
+        CnAlarmNotification: GatewayOperation.CnAlarmNotificationType,
+        CnFupReadRegisterRequest: GatewayOperation.CnFupReadRegisterRequestType,
+        CnFupReadRegisterConfirm: GatewayOperation.CnFupReadRegisterConfirmType,
+        CnFupProgramBeginRequest: GatewayOperation.CnFupProgramBeginRequestType,
+        CnFupProgramBeginConfirm: GatewayOperation.CnFupProgramBeginConfirmType,
+        CnFupProgramRequest: GatewayOperation.CnFupProgramRequestType,
+        CnFupProgramConfirm: GatewayOperation.CnFupProgramConfirmType,
+        CnFupProgramEndRequest: GatewayOperation.CnFupProgramEndRequestType,
+        CnFupProgramEndConfirm: GatewayOperation.CnFupProgramEndConfirmType,
+        CnFupReadRequest: GatewayOperation.CnFupReadRequestType,
+        CnFupReadConfirm: GatewayOperation.CnFupReadConfirmType,
+        CnFupResetRequest: GatewayOperation.CnFupResetRequestType,
+        CnFupResetConfirm: GatewayOperation.CnFupResetConfirmType,
+    }
+
+    class_to_confirm = {
+        SetAddressRequest: SetAddressConfirm,
+        RegisterAppRequest: RegisterAppConfirm,
+        StartSessionRequest: StartSessionConfirm,
+        CloseSessionRequest: CloseSessionConfirm,
+        ListRegisteredAppsRequest: ListRegisteredAppsConfirm,
+        DeregisterAppRequest: DeregisterAppConfirm,
+        ChangePinRequest: ChangePinConfirm,
+        GetRemoteAccessIdRequest: GetRemoteAccessIdConfirm,
+        SetRemoteAccessIdRequest: SetRemoteAccessIdConfirm,
+        GetSupportIdRequest: GetSupportIdConfirm,
+        SetSupportIdRequest: SetSupportIdConfirm,
+        GetWebIdRequest: GetWebIdConfirm,
+        SetWebIdRequest: SetWebIdConfirm,
+        SetPushIdRequest: SetPushIdConfirm,
+        DebugRequest: DebugConfirm,
+        UpgradeRequest: UpgradeConfirm,
+        SetDeviceSettingsRequest: SetDeviceSettingsConfirm,
+        VersionRequest: VersionConfirm,
+        CnTimeRequest: CnTimeConfirm,
+        CnRmiRequest: CnRmiResponse,
+        CnRmiAsyncRequest: CnRmiAsyncConfirm,
+        CnRpdoRequest: CnRpdoConfirm,
+        CnFupReadRegisterRequest: CnFupReadRegisterConfirm,
+        CnFupProgramBeginRequest: CnFupProgramBeginConfirm,
+        CnFupProgramRequest: CnFupProgramConfirm,
+        CnFupProgramEndRequest: CnFupProgramEndConfirm,
+        CnFupReadRequest: CnFupReadConfirm,
+        CnFupResetRequest: CnFupResetConfirm,
+    }
+
+    request_type_to_class_mapping = {
+        GatewayOperation.SetAddressRequestType: SetAddressRequest,
+        GatewayOperation.RegisterAppRequestType: RegisterAppRequest,
+        GatewayOperation.StartSessionRequestType: StartSessionRequest,
+        GatewayOperation.CloseSessionRequestType: CloseSessionRequest,
+        GatewayOperation.ListRegisteredAppsRequestType: ListRegisteredAppsRequest,
+        GatewayOperation.DeregisterAppRequestType: DeregisterAppRequest,
+        GatewayOperation.ChangePinRequestType: ChangePinRequest,
+        GatewayOperation.GetRemoteAccessIdRequestType: GetRemoteAccessIdRequest,
+        GatewayOperation.SetRemoteAccessIdRequestType: SetRemoteAccessIdRequest,
+        GatewayOperation.GetSupportIdRequestType: GetSupportIdRequest,
+        GatewayOperation.SetSupportIdRequestType: SetSupportIdRequest,
+        GatewayOperation.GetWebIdRequestType: GetWebIdRequest,
+        GatewayOperation.SetWebIdRequestType: SetWebIdRequest,
+        GatewayOperation.SetPushIdRequestType: SetPushIdRequest,
+        GatewayOperation.DebugRequestType: DebugRequest,
+        GatewayOperation.UpgradeRequestType: UpgradeRequest,
+        GatewayOperation.SetDeviceSettingsRequestType: SetDeviceSettingsRequest,
+        GatewayOperation.VersionRequestType: VersionRequest,
+        GatewayOperation.SetAddressConfirmType: SetAddressConfirm,
+        GatewayOperation.RegisterAppConfirmType: RegisterAppConfirm,
+        GatewayOperation.StartSessionConfirmType: StartSessionConfirm,
+        GatewayOperation.CloseSessionConfirmType: CloseSessionConfirm,
+        GatewayOperation.ListRegisteredAppsConfirmType: ListRegisteredAppsConfirm,
+        GatewayOperation.DeregisterAppConfirmType: DeregisterAppConfirm,
+        GatewayOperation.ChangePinConfirmType: ChangePinConfirm,
+        GatewayOperation.GetRemoteAccessIdConfirmType: GetRemoteAccessIdConfirm,
+        GatewayOperation.SetRemoteAccessIdConfirmType: SetRemoteAccessIdConfirm,
+        GatewayOperation.GetSupportIdConfirmType: GetSupportIdConfirm,
+        GatewayOperation.SetSupportIdConfirmType: SetSupportIdConfirm,
+        GatewayOperation.GetWebIdConfirmType: GetWebIdConfirm,
+        GatewayOperation.SetWebIdConfirmType: SetWebIdConfirm,
+        GatewayOperation.SetPushIdConfirmType: SetPushIdConfirm,
+        GatewayOperation.DebugConfirmType: DebugConfirm,
+        GatewayOperation.UpgradeConfirmType: UpgradeConfirm,
+        GatewayOperation.SetDeviceSettingsConfirmType: SetDeviceSettingsConfirm,
+        GatewayOperation.VersionConfirmType: VersionConfirm,
+        GatewayOperation.GatewayNotificationType: GatewayNotification,
+        GatewayOperation.KeepAliveType: KeepAlive,
+        GatewayOperation.FactoryResetType: FactoryReset,
+        GatewayOperation.CnTimeRequestType: CnTimeRequest,
+        GatewayOperation.CnTimeConfirmType: CnTimeConfirm,
+        GatewayOperation.CnNodeRequestType: CnNodeRequest,
+        GatewayOperation.CnNodeNotificationType: CnNodeNotification,
+        GatewayOperation.CnRmiRequestType: CnRmiRequest,
+        GatewayOperation.CnRmiResponseType: CnRmiResponse,
+        GatewayOperation.CnRmiAsyncRequestType: CnRmiAsyncRequest,
+        GatewayOperation.CnRmiAsyncConfirmType: CnRmiAsyncConfirm,
+        GatewayOperation.CnRmiAsyncResponseType: CnRmiAsyncResponse,
+        GatewayOperation.CnRpdoRequestType: CnRpdoRequest,
+        GatewayOperation.CnRpdoConfirmType: CnRpdoConfirm,
+        GatewayOperation.CnRpdoNotificationType: CnRpdoNotification,
+        GatewayOperation.CnAlarmNotificationType: CnAlarmNotification,
+        GatewayOperation.CnFupReadRegisterRequestType: CnFupReadRegisterRequest,
+        GatewayOperation.CnFupReadRegisterConfirmType: CnFupReadRegisterConfirm,
+        GatewayOperation.CnFupProgramBeginRequestType: CnFupProgramBeginRequest,
+        GatewayOperation.CnFupProgramBeginConfirmType: CnFupProgramBeginConfirm,
+        GatewayOperation.CnFupProgramRequestType: CnFupProgramRequest,
+        GatewayOperation.CnFupProgramConfirmType: CnFupProgramConfirm,
+        GatewayOperation.CnFupProgramEndRequestType: CnFupProgramEndRequest,
+        GatewayOperation.CnFupProgramEndConfirmType: CnFupProgramEndConfirm,
+        GatewayOperation.CnFupReadRequestType: CnFupReadRequest,
+        GatewayOperation.CnFupReadConfirmType: CnFupReadConfirm,
+        GatewayOperation.CnFupResetRequestType: CnFupResetRequest,
+        GatewayOperation.CnFupResetConfirmType: CnFupResetConfirm,
     }
 
     def __init__(self, cmd, msg, src, dst):
@@ -77,6 +175,24 @@ class Message(object):
         self.msg = msg
         self.src = src
         self.dst = dst
+
+    @classmethod
+    def create(cls, src, dst, command, cmd_params=None, msg_params=None):
+
+        cmd = GatewayOperation()
+        cmd.type = cls.class_to_type[command]
+        if cmd_params is not None:
+            for param in cmd_params:
+                if cmd_params[param] is not None:
+                    setattr(cmd, param, cmd_params[param])
+
+        msg = command()
+        if msg_params is not None:
+            for param in msg_params:
+                if msg_params[param] is not None:
+                    setattr(msg, param, msg_params[param])
+
+        return Message(cmd, msg, src, dst)
 
     def __str__(self):
         return "%s -> %s: %s %s\n%s\n%s" % (
@@ -106,45 +222,12 @@ class Message(object):
         msg_buf = packet[38 + cmd_len:]
 
         # Parse command
-        cmd = zehnder_pb2.GatewayOperation()
+        cmd = GatewayOperation()
         cmd.ParseFromString(cmd_buf)
 
         # Parse message
-        cmd_type = cls.mapping.get(cmd.type)
+        cmd_type = cls.request_type_to_class_mapping.get(cmd.type)
         msg = cmd_type()
         msg.ParseFromString(msg_buf)
 
-        # Check status code
-        if cmd.result == zehnder_pb2.GatewayOperation.OK:
-            pass
-        elif cmd.result == zehnder_pb2.GatewayOperation.BAD_REQUEST:
-            raise PyComfoConnectBadRequest()
-        elif cmd.result == zehnder_pb2.GatewayOperation.INTERNAL_ERROR:
-            raise PyComfoConnectInternalError()
-        elif cmd.result == zehnder_pb2.GatewayOperation.NOT_REACHABLE:
-            raise PyComfoConnectNotReachable()
-        elif cmd.result == zehnder_pb2.GatewayOperation.OTHER_SESSION:
-            raise PyComfoConnectOtherSession(msg.devicename)
-        elif cmd.result == zehnder_pb2.GatewayOperation.NOT_ALLOWED:
-            raise PyComfoConnectNotAllowed()
-        elif cmd.result == zehnder_pb2.GatewayOperation.NO_RESOURCES:
-            raise PyComfoConnectNoResources()
-        elif cmd.result == zehnder_pb2.GatewayOperation.NOT_EXISTS:
-            raise PyComfoConnectNotExists()
-        elif cmd.result == zehnder_pb2.GatewayOperation.RMI_ERROR:
-            raise PyComfoConnectRmiError()
-
         return Message(cmd, msg, src_buf, dst_buf)
-
-    @staticmethod
-    def decode_discovery(packet):
-
-        # Parse command
-        parser = zehnder_pb2.DiscoveryOperation()
-        parser.ParseFromString(packet)
-
-        return {
-            'ip_address': parser.searchGatewayResponse.ipaddress,
-            'uuid': parser.searchGatewayResponse.uuid,
-            'version': parser.searchGatewayResponse.version,
-        }

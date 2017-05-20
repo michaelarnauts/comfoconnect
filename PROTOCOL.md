@@ -109,9 +109,9 @@ This is a list of the commands.
 | SetDeviceSettingsRequestType  | SetDeviceSettingsConfirmType  |                         |                            |
 | VersionRequestType            | VersionConfirmType            |                         |                            |
 |                               |                               | GatewayNotificationType |                            |
-|                               |                               | KeepAliveType           |                            |
+|                               |                               | KeepAliveType           | You should send these to keep the connection open. |
 | FactoryResetType              |                               |                         |                            |
-| CnTimeRequestType             | CnTimeConfirmType             |                         |                            |
+| CnTimeRequestType             | CnTimeConfirmType             |                         | Returns the seconds since 2000-01-01 00:00:00. |
 | CnNodeRequestType             |                               | CnNodeNotificationType  |                            |
 | CnRmiRequestType              | CnRmiResponseType             |                         |                            |
 | CnRmiAsyncRequestType         | CnRmiAsyncConfirmType         | CnRmiAsyncResponseType  |                            |

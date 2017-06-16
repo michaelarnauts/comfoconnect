@@ -5,7 +5,7 @@ long_description = open('README.rst').read()
 
 setup(
     name='pycomfoconnect',
-    version='0.1',
+    version='0.2',
     license='GPL',
     url='https://github.com/michaelarnauts/comfoconnect',
     author='Michaël Arnauts',

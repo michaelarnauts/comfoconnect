@@ -13,6 +13,8 @@ class Bridge(object):
 
     @staticmethod
     def discover(host=None, timeout=5):
+        """Broadcast the network and look for local bridges."""
+
         # Setup socket
         udpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         udpsocket.setblocking(0)
@@ -81,6 +83,7 @@ class Bridge(object):
 
     def is_connected(self):
         """Returns weather there is an open socket."""
+
         return self._socket is not None
 
     def read_message(self, timeout=1) -> Message:

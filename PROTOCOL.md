@@ -283,6 +283,7 @@ Overview of known pdids:
 | 291  | 1    | Temperature & Humidity: Exhaust Air (`57` = 87%) |
 | 292  | 1    | Temperature & Humidity: Outdoor Air (`43` = 67%) |
 | 294  | 1    | Temperature & Humidity: Supply Air (`23` = 35%) |
+| 227  | 1    | Bypass state (`64` = 100%) |
 
 Unknown/uncertain messages:
 
@@ -319,7 +320,6 @@ Unknown/uncertain messages:
 | 224  | 1    | *Unknown* (`03` = 3) |
 | 225  | 1    | *Unknown* (`01`) |
 | 226  | 2    | *Unknown* (`6400` = 100) |
-| 227  | 1    | *Unknown* (`05`) |
 | 228  | 1    | *Unknown* (`00`) |
 | 321  | 2    | *Unknown* (`0700` = 7) |
 | 325  | 2    | *Unknown* (`0100` = 1) |

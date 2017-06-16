@@ -44,7 +44,7 @@ class PyComfoConnectNoResources(PyComfoConnectError):
     pass
 
 
-class PyComfoConnectNotExists(PyComfoConnectError):
+class PyComfoConnectNotExist(PyComfoConnectError):
     pass
 
 

@@ -5,12 +5,12 @@ long_description = open('README.rst').read()
 
 setup(
     name='pycomfoconnect',
-    version='0.2',
-    license='GPL',
+    version='0.3',
+    license='MIT',
     url='https://github.com/michaelarnauts/comfoconnect',
     author='Michaël Arnauts',
     author_email='michael.arnauts@gmail.com',
-    description='Python module to talk to a Zehnder ComfoConnect LAN C module for the Zehnder Q350/Q450/Q650 ventilation units.',
+    description='Python interface for the Zehnder ComfoConnect LAN C bridge.',
     long_description=long_description,
     packages=find_packages(),
     zip_safe=False,
@@ -18,10 +18,10 @@ setup(
     platforms='any',
     install_requires=list(val.strip() for val in open('requirements.txt')),
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
-        'License :: OSI Approved :: GPL License',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
     ]

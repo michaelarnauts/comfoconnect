@@ -260,6 +260,8 @@ Overview of known pdids:
 
 | pdid | type | description                                                                                            |
 |------|------|--------------------------------------------------------------------------------------------------------|
+| 49   | 1    | Operating mode (`01` = limited manual, `05` = unlimited manual, `ff` = auto) |
+| 56   | 1    | Operating mode (`01` = unlimited manual, `ff` = auto) |
 | 65   | 1    | Fans: Fan speed setting (`00` (away), `01`, `02` or `03`) |
 | 81   | 3    | General: Countdown until next fan speed change (`52020000` = 00000252 -> 594 seconds) |
 | 117  | 1    | Fans: Supply fan duty (`1c` = 28%) |
@@ -289,8 +291,6 @@ Unknown/uncertain messages:
 
 | pdid | type | description                                                                                            |
 |------|------|--------------------------------------------------------------------------------------------------------|
-| 49   | 1    | Operating mode (`01` = manual, `05` = manual, `ff` = auto) |
-| 56   | 1    | Operating mode (`01` = manual, `ff` = auto) |
 | 337  | 3    | *Unknown* (`26000000` = 2409368) |
 | 16   | 1    | *Unknown* (`01`) |
 | 33   | 1    | *Unknown* (`01`) |

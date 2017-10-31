@@ -264,12 +264,12 @@ Overview of known pdids:
 | 56   | 1    | Operating mode (`01` = unlimited manual, `ff` = auto) |
 | 65   | 1    | Fans: Fan speed setting (`00` (away), `01`, `02` or `03`) |
 | 81   | 3    | General: Countdown until next fan speed change (`52020000` = 00000252 -> 594 seconds) |
-| 117  | 1    | Fans: Supply fan duty (`1c` = 28%) |
-| 118  | 1    | Fans: Exhaust fan duty (`1d` = 29%) |
-| 119  | 2    | Fans: Supply fan flow (`6e00` = 110 m³/h) |
-| 120  | 2    | Fans: Exhaust fan flow (`6900` = 105 m³/h) |
-| 121  | 2    | Fans: Supply fan speed (`2d04` = 1069 rpm) |
-| 122  | 2    | Fans: Exhaust fan speed (`5904` = 1113 rpm) |
+| 117  | 1    | Fans: Exhaust fan duty (`1c` = 28%) |
+| 118  | 1    | Fans: Supply fan duty (`1d` = 29%) |
+| 119  | 2    | Fans: Exhaust fan flow (`6e00` = 110 m³/h) |
+| 120  | 2    | Fans: Supply fan flow (`6900` = 105 m³/h) |
+| 121  | 2    | Fans: Exhaust fan speed (`2d04` = 1069 rpm) |
+| 122  | 2    | Fans: Supply fan speed (`5904` = 1113 rpm) |
 | 128  | 2    | Power Consumption: Current Ventilation (`0f00` = 15 W)  |
 | 129  | 2    | Power Consumption: Total year-to-date (`1700` = 23 kWh) |
 | 130  | 2    | Power Consumption: Total from start (`1700` = 23 kWh) |
@@ -355,7 +355,7 @@ Overview of the types:
 
 #### CnRmiRequest (`CnRmiRequestType` and `CnRmiResponseType`)
 You can execute a function on the device by invoking a `type: CnRmiRequestType`. You need to specify the `nodeId` and a
-`message`.
+`message`. This can make a configuration change, or request data.
 
 ```javascript
 type: CnRmiRequestType
@@ -377,22 +377,49 @@ Overview of known CnRmiRequests:
 
 The request and response seems to be in little endian format (eg. `0x5802` => `0x258` => 600)
 
-| Request                            | Response                                             | Description              |
-|------------------------------------|------------------------------------------------------|--------------------------|
-| `0101 0110 08`                     | `ComfoAir Q450 B R RF ST Quality\x00`                | Get HRU Type             |
-| `8415 0101 0000 0000 0100 0000 00` | *Empty*                                              | Switch to away mode      |
-| `8415 0101 0000 0000 0100 0000 01` | *Empty*                                              | Switch to fan speed 1    |
-| `8415 0101 0000 0000 0100 0000 02` | *Empty*                                              | Switch to fan speed 2    |
-| `8415 0101 0000 0000 0100 0000 03` | *Empty*                                              | Switch to fan speed 3    |
-| `8415 0106 0000 0000 5802 0000 03` | *Empty*                                              | Start boost mode for 10m (= 600 seconds = `0x0258`) |
-| `8515 0106`                        | *Empty*                                              | End boost mode           |
-| `8515 0801`                        | *Empty*                                              | Switch to auto mode      |
-| `8715 01`                          | *See below*                                          | Read out configuration   |
+This is a list of known commands:
 
-Extra details for `8715 01`:
+| Command                            | Description                                                                     |
+|------------------------------------|---------------------------------------------------------------------------------|
+| `8415 0101 0000 0000 0100 0000 00` | Switch to fan speed away                                                        |
+| `8415 0101 0000 0000 0100 0000 01` | Switch to fan speed 1                                                           |
+| `8415 0101 0000 0000 0100 0000 02` | Switch to fan speed 2                                                           |
+| `8415 0101 0000 0000 0100 0000 03` | Switch to fan speed 3                                                           |
+| `8415 0106 0000 0000 5802 0000 03` | Bosst mode: start for 10m (= 600 seconds = `0x0258`)                            |
+| `8515 0106`                        | Boost mode: end                                                                 |
+| `8515 0801`                        | Switch to auto mode                                                             |
+| `8415 0801 0000 0000 0100 0000 01` | Switch to manual mode                                                           |
+| `8415 0601 00000000 100e0000 01`   | Set ventilation mode: supply only for 1 hour                                    |
+| `8515 0601`                        | Set ventilation mode: balance mode                                              |
+| `8415 0301 00000000 ffffffff 00`   | Set temperature profile: normal                                                 |
+| `8415 0301 00000000 ffffffff 01`   | Set temperature profile: cool                                                   |
+| `8415 0301 00000000 ffffffff 02`   | Set temperature profile: warm                                                   |
+| `8415 0201 00000000 100e0000 01`   | Set bypass: activated for 1 hour                                                |
+| `8415 0201 00000000 100e0000 02`   | Set bypass: deactivated for 1 hour                                              |
+| `8515 0201`                        | Set bypass: auto                                                                |
+| `031d 0104 00`                     | Set sensor ventilation: temperature passive: off                                |
+| `031d 0104 01`                     | Set sensor ventilation: temperature passive: auto only                          |
+| `031d 0104 02`                     | Set sensor ventilation: temperature passive: on                                 |
+| `031d 0106 00`                     | Set sensor ventilation: humidity comfort: off                                   |
+| `031d 0106 01`                     | Set sensor ventilation: humidity comfort: auto only                             |
+| `031d 0106 02`                     | Set sensor ventilation: humidity comfort: on                                    |
+| `031d 0107 00`                     | Set sensor ventilation: humidity protection: off                                |
+| `031d 0107 01`                     | Set sensor ventilation: humidity protection: auto                               |
+| `031d 0107 02`                     | Set sensor ventilation: humidity protection: on                                 |
+
+This is a list of known data requests:
+
+| Request                            | Response                                                | Description              |
+|------------------------------------|---------------------------------------------------------|--------------------------|
+| `0101 0110 08`                     | `ComfoAir Q450 B R RF ST Quality\x00`                   | Get HRU Type             |
+| `0101 0110 0b`                     | `471502004\x00`                                         | Get Article Number       |
+| `0201 0101 1503 0406 0507`         | `\x02BEA004185030000\x00\x00\x10\x10\xc0\x02\x00T\x10@` | Get Serial Number and maybe some other stuff |
+| `8715 01`                          | *See below*                                             | Read out configuration   |
+
+Extra details for `8715 01` (configuration readout):
 ```
                                 SS                     AAAAAAAA BB                                                                      CC                                           DDDDDDDD EEEEEEEE
-manual / boost for 1h / away: 
+manual / boost for 1h / away:
 0b00 00000000 201c0000 00000000 0100 00000000 201c0000 00000000 01 00 0000 0000 201c 0000 0000 0000 0100 0000 0000201c 00000000 0000 01 01 00000000 ffffffff ffffffff 0100 0000 0000 58020000 00000000 0300 0000 0000 5802 0000 0000 0000030000000000080700000000000003000000000008070000000000000300000000005802000000000000030000000000b00400000000000000
 0b00 00000000 201c0000 00000000 0100 00000000 201c0000 00000000 01 00 0000 0000 201c 0000 0000 0000 0100 0000 0000201c 00000000 0000 01 01 00000000 ffffffff ffffffff 0101 0000 0000 100e0000 0c0e0000 0300 0000 0000 5802 0000 0000 0000030000000000080700000000000003000000000008070000000000000300000000005802000000000000030000000000b00400000000000000
 0b01 00000000 ffffffff ffffffff 0000 00000000 201c0000 00000000 01 00 0000 0000 201c 0000 0000 0000 0100 0000 0000201c 00000000 0000 01 01 00000000 ffffffff ffffffff 0100 0000 0000 58020000 00000000 0300 0000 0000 5802 0000 0000 0000030000000000080700000000000003000000000008070000000000000300000000005802000000000000030000000000b00400000000000000
@@ -409,10 +436,10 @@ manual away / manual 1
 ```
 
 ```
-A: General: Countdown until next fan speed change (`52020000` = 00000252 -> 594 seconds) 
+A: General: Countdown until next fan speed change (`52020000` = 00000252 -> 594 seconds)
 S: Fans: Fan speed setting: `0000` (away), `0100`, `0200` or `0300` (configured from app)
 B: Fans: Fan speed setting: `0000` (away), `0100`, `0200` or `0300` (configured from remote)
-C: Operating mode: `00` (auto), `01` (manual) 
+C: Operating mode: `00` (auto), `01` (manual)
 D: Configured boost duration
 E: Remaining boost duration
 ```
@@ -421,14 +448,11 @@ Unknown messages:
 
 | Request                      | Response                                                   | Description              |
 |------------------------------|------------------------------------------------------------|--------------------------|
-| `8315 0105`                  | `0100 0000 00ff ffff ffff ffff ff00`                       | Switch to manual mode, but needs more commands |
-| `0101 0110 0b`               | `471502004\x00`                                            | *Unknown*                |
 | `0117 0110 02`               | `\x01`                                                     | *Unknown*                |
 | `0117 0210 02`               | `\x00`                                                     | *Unknown*                |
 | `0120 0110 06`               | `\x00`                                                     | *Unknown*                |
 | `0124 0110 0b`               | `\x00`                                                     | *Unknown*                |
 | `0125 0010 03`               | `\x00`                                                     | *Unknown*                |
-| `0201 0101 1503 0406 0507`   | `\x02BEA004185031910\x00\x00\x10\x10\xc0\x02\x00T\x10@`    | *Unknown*                |
 | `8015 0101`                  | `\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01`        | *Unknown*                |
 | `8315 0101`                  | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01` | *Unknown*                |
 | `8315 0102`                  | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03` | *Unknown*                |

@@ -274,10 +274,12 @@ Overview of known pdids:
 | 129  | 2    | Power Consumption: Total year-to-date (`1700` = 23 kWh) |
 | 130  | 2    | Power Consumption: Total from start (`1700` = 23 kWh) |
 | 192  | 2    | Days left before filters must be replaced (`8200` = 130 days) |
+| 209  | 6    | Current RMOT (`7500` = 117 -> 11.7 °C) |
 | 213  | 2    | Avoided Heating: Avoided actual: (`b901` = 441 -> 4.41 W) |
 | 214  | 2    | Avoided Heating: Avoided year-to-date: (`dd01` = 477 kWh) |
 | 215  | 2    | Avoided Heating: Avoided total: (`dd01` = 477 kWh) |
 | 221  | 6    | Temperature & Humidity: Supply Air (`aa00` = 170 -> 17.0 °C) |
+| 227  | 1    | Bypass state (`64` = 100%) |
 | 274  | 6    | Temperature & Humidity: Extract Air (`ab00` = 171 -> 17.1 °C) |
 | 275  | 6    | Temperature & Humidity: Exhaust Air (`5600` = 86 -> 8.6 °C) |
 | 276  | 6    | Temperature & Humidity: Outdoor Air (`3c00` = 60 -> 6.0 °C) |
@@ -285,13 +287,11 @@ Overview of known pdids:
 | 291  | 1    | Temperature & Humidity: Exhaust Air (`57` = 87%) |
 | 292  | 1    | Temperature & Humidity: Outdoor Air (`43` = 67%) |
 | 294  | 1    | Temperature & Humidity: Supply Air (`23` = 35%) |
-| 227  | 1    | Bypass state (`64` = 100%) |
 
 Unknown/uncertain messages:
 
 | pdid | type | description                                                                                            |
 |------|------|--------------------------------------------------------------------------------------------------------|
-| 337  | 3    | *Unknown* (`26000000` = 2409368) |
 | 16   | 1    | *Unknown* (`01`) |
 | 33   | 1    | *Unknown* (`01`) |
 | 37   | 1    | *Unknown* (`00`) |
@@ -309,7 +309,6 @@ Unknown/uncertain messages:
 | 146  | 2    | *Unknown* (`00`) |
 | 176  | 1    | *Unknown* (`00`) |
 | 208  | 1    | *Unknown* (`00`) |
-| 209  | 6    | *Unknown* (`4700` = 71 ) |
 | 210  | 0    | *Unknown* (`00` = false) |
 | 211  | 0    | *Unknown* (`00` = false) |
 | 212  | 6    | *Unknown* (`ee00` = 238) |
@@ -323,6 +322,7 @@ Unknown/uncertain messages:
 | 228  | 1    | *Unknown* (`00`) |
 | 321  | 2    | *Unknown* (`0700` = 7) |
 | 325  | 2    | *Unknown* (`0100` = 1) |
+| 337  | 3    | *Unknown* (`26000000` = 2409368) |
 | 338  | 3    | *Unknown* (`00000000`) |
 | 341  | 3    | *Unknown* (`00000000`) |
 | 369  | 1    | *Unknown* (`00`) |

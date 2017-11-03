@@ -95,6 +95,55 @@ def main():
     comfoconnect.register_sensor(SENSOR_HUMIDITY_EXHAUST)  # Temperature & Humidity: Exhaust Air (temperature)
     comfoconnect.register_sensor(SENSOR_HUMIDITY_OUTDOOR)  # Temperature & Humidity: Outdoor Air (temperature)
     comfoconnect.register_sensor(SENSOR_BYPASS_STATE)  # Bypass state
+    comfoconnect.register_sensor(SENSOR_OPERATING_MODE)  # Operating mode
+    comfoconnect.register_sensor(SENSOR_OPERATING_MODE_BIS)  # Operating mode (bis)
+
+    # comfoconnect.register_sensor(16) # 1
+    # comfoconnect.register_sensor(33) # 1
+    # comfoconnect.register_sensor(37) # 0
+    # comfoconnect.register_sensor(53) # -1
+    # comfoconnect.register_sensor(66) # 0
+    # comfoconnect.register_sensor(67) # 0
+    # comfoconnect.register_sensor(70) # 0
+    # comfoconnect.register_sensor(71) # 0
+    # comfoconnect.register_sensor(82) # ffffffff
+    # comfoconnect.register_sensor(85) # ffffffff
+    # comfoconnect.register_sensor(86) # ffffffff
+    # comfoconnect.register_sensor(87) # ffffffff
+    # comfoconnect.register_sensor(144) # 0
+    # comfoconnect.register_sensor(145) # 0
+    # comfoconnect.register_sensor(146) # 0
+    # comfoconnect.register_sensor(176) # 0
+    # comfoconnect.register_sensor(208) # 0
+    # comfoconnect.register_sensor(210) # 0
+    # comfoconnect.register_sensor(211) # 0
+    # comfoconnect.register_sensor(212) # 228
+    # comfoconnect.register_sensor(216) # 0
+    # comfoconnect.register_sensor(217) # 28
+    # comfoconnect.register_sensor(218) # 28
+    # comfoconnect.register_sensor(219) # 0
+    # comfoconnect.register_sensor(224) # 3
+    # comfoconnect.register_sensor(225) # 1
+    # comfoconnect.register_sensor(226) # 100
+    # comfoconnect.register_sensor(228) # 0
+    # comfoconnect.register_sensor(321) # 15
+    # comfoconnect.register_sensor(325) # 1
+    # comfoconnect.register_sensor(337) #
+    # comfoconnect.register_sensor(338) # 00000000
+    # comfoconnect.register_sensor(341) # 00000000
+    # comfoconnect.register_sensor(369) # 0
+    # comfoconnect.register_sensor(370) # 0
+    # comfoconnect.register_sensor(371) # 0
+    # comfoconnect.register_sensor(372) # 0
+    # comfoconnect.register_sensor(384) # 0
+    # comfoconnect.register_sensor(386) # 0
+    # comfoconnect.register_sensor(400) # 0
+    # comfoconnect.register_sensor(401) # 0
+    # comfoconnect.register_sensor(402) # 0
+    # comfoconnect.register_sensor(416) # -400
+    # comfoconnect.register_sensor(417) # 100
+    # comfoconnect.register_sensor(418) # 0
+    # comfoconnect.register_sensor(419) # 0
 
     ## Execute functions ###############################################################################################
 
@@ -136,6 +185,7 @@ def main():
 
     ## Closing the session #############################################################################################
 
+    print('Disconnecting...')
     comfoconnect.disconnect()
 
 

@@ -98,11 +98,11 @@ The Ventilation is seperated into multiple Units, and sometimes even SubUnits. H
 | 0x19      | 1                     | PREHEATER         | Represents the optional preheater                                                             |
 | 0x1A      | 1                     | HMI               | Represents the Display + Buttons                                                              |
 | 0x1B      | 1                     | RFCOMMUNICATION   | wireless-communication with attached devices                                                  |
-| 0x1C      | 1                     | FILTER            | Counts the days since last filter change
+| 0x1C      | 1                     | FILTER            | Counts the days since last filter change                                                      |
+| 0x1D      | 1                     | TEMPHUMCONTROL    | Controls the target temperature, if its cooling or heating period and some settings           |
+| 0x1E      | 1                     | VENTILATIONCONFIG | Responsible for managing various configuration options of the ventilation                     |
+| 0x20      | 1                     | NODECONFIGURATION | Manages also some options                                                                     |
 
-        "TEMPHUMCONTROL": 0x1D,
-        "VENTILATIONCONFIG": 0x1E,
-        "NODECONFIGURATION": 0x20,
         "TEMPERATURESENSOR": 0x21,
         "HUMIDITYSENSOR": 0x22,
         "PRESSURESENSOR": 0x23,
@@ -113,12 +113,38 @@ The Ventilation is seperated into multiple Units, and sometimes even SubUnits. H
         "COMFOFOND": 0x28,
 
 # General commands
-There are three commands which always exist on a given Unit
+There are three commands which always exist on a given Unit:
+ - `0x01`: Read single property:
+   
+   This command reads a single property identified by the Unit, SubUnit and Property Id.
+   Each writable property may have a definitionrange & recommended step size which are also accesible
 
+   The syntax is: `01 UnitId SubUnitId GetType PropertyId`
+   The answer is depended on the type of the property and the GetType. If the value, range and step (everything) is requested, the answer is: Value, lower boundry of range, upper boundry of range, step size.
 
-# Overview of known CnRmiRequests:
+   Example: Get maintainer password: `01 20 01 10 03`, answer: `34 32 31 30 00` (4210\0)\
+   Unit is `NODECONFIGURATION`, first SubUnit, PropertyId `03`
 
-The request and response are in little endian format (eg. `0x5802` => `0x258` => 600)
+ - `0x02`: Read multiple property:
+   
+   This command allows to read multiple propertys within one request, given that the caller knows the type of each.
+   As this command can be replaced by multiple calls to 0x01, we omit it here.
+
+ - `0x03`: Set a single property:
+
+   This commands sets one property to the given value. The value needs to be in the range as identified within 0x01, otherwise an error of 30 is returned. The step size, however, is not checked.
+   
+   Syntax: `03 UnitId SubUnitId PropertyId Value`
+
+   Example: `03 1D 01 04 00`\
+   Unit is `TEMPHUMCONTROL`, first SubUnit, PropertyId: `04`\
+   Sets the Property "Sensor ventilation: Temperature passive" to off
+
+All other commands are >= 0x80 and dependent on the SubUnit.
+One example for a custom, unit dependent command is 0x85 from Unit `SCHEDULE` (`15`). It disables a given Timer Entry for a timer, in the example it allows the bypass to be returning to its automatic position:\
+`85 15 02 01`
+
+# Basic list of commonly-used commands:
 
 This is a list of known commands:
 
@@ -128,7 +154,7 @@ This is a list of known commands:
 | `8415 0101 0000 0000 0100 0000 01` | Switch to fan speed 1                                                           |
 | `8415 0101 0000 0000 0100 0000 02` | Switch to fan speed 2                                                           |
 | `8415 0101 0000 0000 0100 0000 03` | Switch to fan speed 3                                                           |
-| `8415 0106 0000 0000 5802 0000 03` | Bosst mode: start for 10m (= 600 seconds = `0x0258`)                            |
+| `8415 0106 0000 0000 5802 0000 03` | Boost mode: start for 10m (= 600 seconds = `0x0258`)                            |
 | `8515 0106`                        | Boost mode: end                                                                 |
 | `8515 0801`                        | Switch to auto mode                                                             |
 | `8415 0801 0000 0000 0100 0000 01` | Switch to manual mode                                                           |
@@ -149,37 +175,3 @@ This is a list of known commands:
 | `031d 0107 00`                     | Set sensor ventilation: humidity protection: off                                |
 | `031d 0107 01`                     | Set sensor ventilation: humidity protection: auto                               |
 | `031d 0107 02`                     | Set sensor ventilation: humidity protection: on                                 |
-
-This is a list of known data requests:
-
-| Request                            | Response                                                | Description              |
-|------------------------------------|---------------------------------------------------------|--------------------------|
-| `0101 0110 08`                     | `ComfoAir Q450 B R RF ST Quality\x00`                   | Get HRU Type             |
-| `0101 0110 0b`                     | `471502004\x00`                                         | Get Article Number       |
-| `0201 0101 1503 0406 0507`         | `\x02BEA004185030000\x00\x00\x10\x10\xc0\x02\x00T\x10@` | Get Serial Number and maybe some other stuff |
-| `8715 01`                          | Big response with all Timerreasons glued together       | Read out current Timers for the given   |
-
-
-```
-A: General: Countdown until next fan speed change (`52020000` = 00000252 -> 594 seconds)
-S: Fans: Fan speed setting: `0000` (away), `0100`, `0200` or `0300` (configured from app)
-B: Fans: Fan speed setting: `0000` (away), `0100`, `0200` or `0300` (configured from remote)
-C: Operating mode: `00` (auto), `01` (manual)
-D: Configured boost duration
-E: Remaining boost duration
-```
-
-Unknown messages:
-
-| Request                      | Response                                                   | Description              |
-|------------------------------|------------------------------------------------------------|--------------------------|
-| `0117 0110 02`               | `\x01`                                                     | *Unknown*                |
-| `0117 0210 02`               | `\x00`                                                     | *Unknown*                |
-| `0120 0110 06`               | `\x00`                                                     | *Unknown*                |
-| `0124 0110 0b`               | `\x00`                                                     | *Unknown*                |
-| `0125 0010 03`               | `\x00`                                                     | *Unknown*                |
-| `8015 0101`                  | `\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01`        | *Unknown*                |
-| `8315 0101`                  | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x01` | *Unknown*                |
-| `8315 0102`                  | `\x01\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x03` | *Unknown*                |
-| `8615 01`                    | `\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x02\x01\x00\x00\x00\x80Q\x01\x00\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00` | *Unknown* |
-| `8715 05`                    | `\x01\x00\x00\x00\x00\x00\x08\x07\x00\x00\x00\x00\x00\x00\x01` | *Unknown*            |

@@ -20,15 +20,17 @@ Overview of known pdids:
 | 213  | 2    | Avoided Heating: Avoided actual: (`b901` = 441 -> 4.41 W) |
 | 214  | 2    | Avoided Heating: Avoided year-to-date: (`dd01` = 477 kWh) |
 | 215  | 2    | Avoided Heating: Avoided total: (`dd01` = 477 kWh) |
-| 221  | 6    | Temperature & Humidity: Supply Air (`aa00` = 170 -> 17.0 °C) |
+| 221  | 6    | Temperature & Humidity: Supply Air (`aa00` = 170 -> 17.0 °C) PostHeaterTempAfter |
 | 227  | 1    | Bypass state (`64` = 100%) |
 | 274  | 6    | Temperature & Humidity: Extract Air (`ab00` = 171 -> 17.1 °C) |
 | 275  | 6    | Temperature & Humidity: Exhaust Air (`5600` = 86 -> 8.6 °C) |
 | 276  | 6    | Temperature & Humidity: Outdoor Air (`3c00` = 60 -> 6.0 °C) |
+| 278  | 6    | PostHeaterTempBefore |
 | 290  | 1    | Temperature & Humidity: Extract Air (`31` = 49%) |
 | 291  | 1    | Temperature & Humidity: Exhaust Air (`57` = 87%) |
 | 292  | 1    | Temperature & Humidity: Outdoor Air (`43` = 67%) |
 | 294  | 1    | Temperature & Humidity: Supply Air (`23` = 35%) |
+| 785  | 0    | ComfoCoolCompressor State |
 
 Unknown/uncertain messages:
 
@@ -50,7 +52,7 @@ Unknown/uncertain messages:
 | 145  | 2    | *Unknown* (`00`) |
 | 146  | 2    | *Unknown* (`00`) |
 | 176  | 1    | *Unknown* (`00`) |
-| 208  | 1    | *Unknown* (`00`) |
+| 208  | 1    | *Unknown* (`00`), Unit of temperature |
 | 210  | 0    | *Unknown* (`00` = false) |
 | 211  | 0    | *Unknown* (`00` = false) |
 | 212  | 6    | *Unknown* (`ee00` = 238) |
@@ -61,7 +63,7 @@ Unknown/uncertain messages:
 | 224  | 1    | *Unknown* (`03` = 3) |
 | 225  | 1    | *Unknown* (`01`) |
 | 226  | 2    | *Unknown* (`6400` = 100) |
-| 228  | 1    | *Unknown* (`00`) |
+| 228  | 1    | *Unknown* (`00`) FrostProtectionUnbalance |
 | 321  | 2    | *Unknown* (`0700` = 7) |
 | 325  | 2    | *Unknown* (`0100` = 1) |
 | 337  | 3    | *Unknown* (`26000000` = 2409368) |
@@ -75,11 +77,11 @@ Unknown/uncertain messages:
 | 386  | 0    | *Unknown* (`00` = false) |
 | 400  | 6    | *Unknown* (`0000`) |
 | 401  | 1    | *Unknown* (`00`) |
-| 402  | 0    | *Unknown* (`00` = false) |
-| 416  | 6    | *Unknown* (`70fe` = -400) |
-| 417  | 6    | *Unknown* (`6400` = 100) |
-| 418  | 1    | *Unknown* (`00`) |
-| 419  | 0    | *Unknown* (`00` = false) |
+| 402  | 0    | *Unknown* (`00` = false) PostHeaterPresent? |
+| 416  | 6    | *Unknown* (`70fe` = -400)  Outdoor air temperature |
+| 417  | 6    | *Unknown* (`6400` = 100) GHE Ground temperature |
+| 418  | 1    | *Unknown* (`00`) GHE State |
+| 419  | 0    | *Unknown* (`00` = false) GHE Present|
 
 Overview of the types:
 
@@ -91,6 +93,7 @@ Overview of the types:
 | 3    | CN_UINT32   | `7856 3412` = 12345678 |
 | 5    | CN_INT8     | |
 | 6    | CN_INT16    | `3412` = 1234 |
+| 8    | CN_INT64    | |
 | 9    | CN_STRING   | |
 | 10   | CN_TIME     | |
 | 11   | CN_VERSION  | |

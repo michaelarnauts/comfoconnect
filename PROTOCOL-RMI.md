@@ -102,8 +102,8 @@ The Ventilation is seperated into multiple Units, and sometimes even SubUnits. H
 | 0x1D      | 1                     | TEMPHUMCONTROL    | Controls the target temperature, if its cooling or heating period and some settings           |
 | 0x1E      | 1                     | VENTILATIONCONFIG | Responsible for managing various configuration options of the ventilation                     |
 | 0x20      | 1                     | NODECONFIGURATION | Manages also some options                                                                     |
+| 0x21    	| 6                     | TEMPERATURESENSOR | Represents the 6 temperature sensors in 
 
-        "TEMPERATURESENSOR": 0x21,
         "HUMIDITYSENSOR": 0x22,
         "PRESSURESENSOR": 0x23,
         "PERIPHERALS": 0x24,

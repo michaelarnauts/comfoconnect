@@ -102,15 +102,14 @@ The Ventilation is seperated into multiple Units, and sometimes even SubUnits. H
 | 0x1D      | 1                     | TEMPHUMCONTROL    | Controls the target temperature, if its cooling or heating period and some settings           |
 | 0x1E      | 1                     | VENTILATIONCONFIG | Responsible for managing various configuration options of the ventilation                     |
 | 0x20      | 1                     | NODECONFIGURATION | Manages also some options                                                                     |
-| 0x21    	| 6                     | TEMPERATURESENSOR | Represents the 6 temperature sensors in 
-
-        "HUMIDITYSENSOR": 0x22,
-        "PRESSURESENSOR": 0x23,
-        "PERIPHERALS": 0x24,
-        "ANALOGINPUT": 0x25,
-        "COOKERHOOD": 0x26,
-        "POSTHEATER": 0x27,
-        "COMFOFOND": 0x28,
+| 0x21    	| 6                     | TEMPERATURESENSOR | Represents the 6 temperature sensors in the ventilation                                       |
+| 0x22      | 6                     | HUMIDITYSENSOR    | Represents the 6 humidity sensors                                                             |
+| 0x23      | 2                     | PRESSURESENSOR    | Represents both pressure sensors                                                              |
+| 0x24      | 1                     | PERIPHERALS       | Stores the ID of the ComfoCool attached, can reset peripheral errors here                     |
+| 0x25      | 4                     | ANALOGINPUT       | Provides data and functionality for the analog inputs, also the scaling for the voltages      |
+| 0x26      | 1                     | COOKERHOOD        | "Dummy" unit, probably represents the ComfoHood if attached                                   |
+| 0x27      | 1                     | POSTHEATER        | Represents the optional post heater attached (temperature sens, config)                       |
+| 0x28      | 1                     | COMFOFOND         | "Dummy" unit, represents the optional comfofond                                               |
 
 # General commands
 There are three commands which always exist on a given Unit:
@@ -143,6 +142,33 @@ There are three commands which always exist on a given Unit:
 All other commands are >= 0x80 and dependent on the SubUnit.
 One example for a custom, unit dependent command is 0x85 from Unit `SCHEDULE` (`15`). It disables a given Timer Entry for a timer, in the example it allows the bypass to be returning to its automatic position:\
 `85 15 02 01`
+
+Please do not try to run command 0x80, 0x82 on NodeConfiguration (0x20), they will probably break your configuration, and even worse would be calling ANY >= 0x80 command on 0x01. \
+It can probably completely brick your ventilation. (it enters factory mode or tries to perform an update)
+
+# Some interesting properties:
+| Unit      | PropId    | Access  | Format    | Description                                                 |
+|-----------|-----------|---------|-----------|-------------------------------------------------------------|
+| 0x1E      | 0x03      | rw      | UINT16    | Ventilation speed in "Away" Level                           |
+| 0x1E      | 0x04      | rw      | UINT16    | Ventilation speed in "Low" Level                            |
+| 0x1E      | 0x05      | rw      | UINT16    | Ventilation speed in "Medium" Level                         |
+| 0x1E      | 0x06      | rw      | UINT16    | Ventilation speed in "High" Level                           |
+| 0x1E      | 0x18      | rw      | INT16     | Disbalance in percent                                       |
+| 0x01      | 0x04      | ro      | STRING    | Serial number                                               |
+| 0x01      | 0x08      | ro      | STRING    | Typenbezeichnung                                            |
+| 0x01      | 0x0B      | ro      | STRING    | Article number                                              |
+| 0x01      | 0x0D      | ro      | STRING    | Country (Manufacturing or Current?)                         |
+| 0x01      | 0x14      | ro      | STRING    | "ComfoAirQ"                                                 |
+| 0x1D      | 0x02      | rw      | INT16     | RMOT for cooling period                                     |
+| 0x1D      | 0x03      | rw      | INT16     | RMOT for heating period                                     |
+| 0x1D      | 0x04      | rw      | UINT8     | Passive temperature control (off, autoonly, on)             |
+| 0x1D      | 0x05      | rw      | UINT8     | unknown (off, autoonly, on)                                 |
+| 0x1D      | 0x06      | rw      | UINT8     | Humidity comfort control (off, autoonly, on)                |
+| 0x1D      | 0x07      | rw      | UINT8     | Humidity protection (off, autoonly, on)                     |
+| 0x1D      | 0x08      | rw      | UINT8     | unknown (off, autoonly, on)                                 |
+| 0x1D      | 0x0A      | rw      | INT16     | Target temperature for profile: Heating                     |
+| 0x1D      | 0x0B      | rw      | INT16     | Target temperature for profile: Normal                      |
+| 0x1D      | 0x0C      | rw      | INT16     | Target temperature for profile: Cooling                     |
 
 # Basic list of commonly-used commands:
 

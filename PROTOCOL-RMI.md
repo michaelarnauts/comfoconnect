@@ -69,6 +69,7 @@ There are two ways of messaging them:
 
 # Enums in the network
 If an error occures the reason maybe one of the following:
+
 | Number    | Description                                                                                               |
 |-----------|-----------------------------------------------------------------------------------------------------------|
 | 11        | Unknown Command                                                                                           |
@@ -86,6 +87,7 @@ For types please check [PROTOCOL-PDO.md](PROTOCOL-PDO.md)
 
 # Units
 The Ventilation is seperated into multiple Units, and sometimes even SubUnits. Here is a list of some existing units:
+
 | ID        | Amount of SubUnits    | Name              | Responsible for                                                                               |
 |-----------|-----------------------|-------------------|-----------------------------------------------------------------------------------------------|
 | 0x01      | 1                     | NODE              | Represents the general node with attributes like serial nr, etc.                              |
@@ -147,6 +149,7 @@ Please do not try to run command 0x80, 0x82 on NodeConfiguration (0x20), they wi
 It can probably completely brick your ventilation. (it enters factory mode or tries to perform an update)
 
 # Some interesting properties:
+
 | Unit      | PropId    | Access  | Format    | Description                                                 |
 |-----------|-----------|---------|-----------|-------------------------------------------------------------|
 | 0x1E      | 0x03      | rw      | UINT16    | Ventilation speed in "Away" Level                           |

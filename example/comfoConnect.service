@@ -1,0 +1,12 @@
+[Unit]
+Description=comfoConnect
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -u auto_update_CAQ_in_Domoticz.py config.CAQ.ini
+WorkingDirectory=/home/pi/domoticz/scripts/comfoConnect
+User=pi
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

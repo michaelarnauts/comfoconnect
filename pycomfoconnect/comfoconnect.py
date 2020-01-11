@@ -14,6 +14,23 @@ DEFAULT_LOCAL_UUID = bytes.fromhex('00000000000000000000000000001337')
 DEFAULT_LOCAL_DEVICENAME = 'pycomfoconnect'
 DEFAULT_PIN = 0
 
+# Product IDs
+"""
+| productId | type           | description                                                                             |
+|-----------|----------------|-----------------------------------------------------------------------------------------|
+| 1         | ComfoAirQ      | The ComfoAirQ ventilation unit.                                                         |
+| 2         | ComfoSense     | ComfoSense C                                                                            |
+| 3         | ComfoSwitch    | ComfoSwitch C                                                                           |
+| 4         | OptionBox      |                                                                                         |
+| 5         | ZehnderGateway | ComfoConnect LAN C                                                                      |
+| 6         | ComfoCool      | ComfoCool Q600                                                                          |
+| 7         | KNXGateway     | ComfoConnect KNX C                                                                      |
+| 8         | Service Tool   |                                                                                         |
+| 9         | PT Tool        | Production test tool                                                                    |
+| 10        | DVT Tool       | Design verification test tool                                                           |
+"""
+PRODUCT_ID = ['None', 'ComfoAirQ', 'ComfoSense', 'ComfoSwitch', 'OptionBox', 'ComfoConnect LAN C', 'ComfoCool Q600', 'ComfoConnect KNX C', 'Service tool', 'Product Test tool', 'Design Verification Test tool']
+
 # Sensor variable size
 RPDO_TYPE_MAP = {
     16: 1,
@@ -109,6 +126,8 @@ class ComfoConnect(object):
         self._queue = queue.Queue()
         self._connected = threading.Event()
         self._stopping = False
+        self._disconnecting = False
+        self._debug = True
         self._message_thread = None
         self._connection_thread = None
 
@@ -123,7 +142,7 @@ class ComfoConnect(object):
 
         try:
             # Start connection
-            self._connect(takeover=takeover)
+            reply = self._connect(takeover=takeover)
 
         except PyComfoConnectNotAllowed:
             raise Exception('Could not connect to the bridge since the PIN seems to be invalid.')
@@ -131,11 +150,14 @@ class ComfoConnect(object):
         except PyComfoConnectOtherSession:
             raise Exception('Could not connect to the bridge since there is already an open session.')
 
-        except:
+        except OSError:
+            print("Unexpected error in connect: ", sys.exc_info()[0])
+            print(reply)
             raise Exception('Could not connect to the bridge.')
 
         # Set the stopping flag
         self._stopping = False
+        self._disconnecting = False
         self._connected.clear()
 
         # Start connection thread
@@ -152,11 +174,24 @@ class ComfoConnect(object):
 
         # Set the stopping flag
         self._stopping = True
+        self._disconnecting = True
 
         # Wait for the background thread to finish
-        self._connection_thread.join()
-        self._connection_thread = None
+        if self._connection_thread != None:
+            self._connection_thread.join()
+            self._connection_thread = None
 
+    def clear_queue(self):
+        """Clear the queue because a connection error occured."""
+        
+        # Set the stopping flag
+        self._stopping = True
+
+        # Wait for the background thread to finish
+        if self._message_thread != None:
+            self._message_thread.join()
+            self._message_thread = None
+        
     def is_connected(self):
         """Returns whether there is a connection with the bridge."""
 
@@ -212,7 +247,13 @@ class ComfoConnect(object):
         self._reference += 1
 
         # Send the message
-        self._bridge.write_message(message)
+        try: 
+            reply = self._bridge.write_message(message)
+        
+        except OSError:
+            print("Unexpected error in _command._bridge.write_message: ", sys.exc_info()[0])
+            if self._debug: print(reply)
+            return False
 
         try:
             # Check if this command has a confirm type set
@@ -220,11 +261,15 @@ class ComfoConnect(object):
 
             # Read a message
             reply = self._get_reply(confirm_type, use_queue=use_queue)
-
             return reply
 
         except KeyError:
             return None
+            
+        except OSError:
+            print("Unexpected error in _command._get_reply for confirm type", str(confirm_type), ": ", sys.exc_info()[0])
+            return False
+            
 
     def _get_reply(self, confirm_type=None, timeout=5, use_queue=True):
         """Pops a message of the queue, optionally looking for a specific type."""
@@ -281,7 +326,12 @@ class ComfoConnect(object):
                     self._queue.put(message)
 
             if time.time() - start > timeout:
-                raise ValueError('Timeout waiting for response.')
+                # why raise?
+                #raise ValueError('Timeout waiting for response.')
+                print('Timeout waiting for response.')
+                if self.is_connected(): self.disconnect()
+                return False
+                # use print followed by disconnect?
 
     # ==================================================================================================================
     # Connection thread
@@ -289,8 +339,8 @@ class ComfoConnect(object):
     def _connection_thread_loop(self):
         """Makes sure that there is a connection open."""
 
-        self._stopping = False
-        while not self._stopping:
+        self._disconnecting = False
+        while not self._disconnecting:
 
             # Start connection
             if not self.is_connected():
@@ -308,24 +358,44 @@ class ComfoConnect(object):
                     continue
 
                 except Exception:
+                    self._bridge.disconnect()
+                    # why raise?
                     raise Exception('Could not connect to the bridge.')
+                    
+                else: self._stopping = False
 
-            # Start background thread
-            self._message_thread = threading.Thread(target=self._message_thread_loop)
-            self._message_thread.start()
+            # Try again if not yet connected
+            if self.is_connected():
+                # Start background thread
+                self._message_thread = threading.Thread(target=self._message_thread_loop)
+                self._message_thread.start()
 
-            # Reregister for sensor updates
-            for sensor_id in self.sensors:
-                self.cmd_rpdo_request(sensor_id, self.sensors[sensor_id])
+                # Reregister for sensor updates
+                if len(self.sensors)>0:
+                    print('Reconnected to Bridge. Registering sensors...')
+                    try: 
+                        for sensor_id in self.sensors:
+                            reply = self.cmd_rpdo_request(sensor_id, self.sensors[sensor_id])
 
-            # Send the event that we are ready
-            self._connected.set()
+                    except OSError:
+                        print("Unexpected error in _connection_thread_loop while registering sensors:", sys.exc_info()[0])
+                        self._stopping = True
 
-            # Wait until the message thread stops working
-            self._message_thread.join()
+                    else: 
+                        print(str(len(self.sensors)) + ' sensor(s) registered, ready event set.')
 
-            # Close socket connection
-            self._bridge.disconnect()
+                # Send the event that we are ready
+                self._connected.set()
+                
+                # Wait until the message thread stops working
+                self._message_thread.join()
+
+                # Close socket connection
+                self._bridge.disconnect()
+            else:
+                print('Could not (re)connect to the Bridge. Trying again...')
+               
+                
 
     def _connect(self, takeover=False):
         """Connect to the bridge and login. Disconnect existing clients if needed by default."""
@@ -335,7 +405,7 @@ class ComfoConnect(object):
             self._bridge.connect()
 
             # Login
-            self.cmd_start_session(takeover, use_queue=False)
+            message = self.cmd_start_session(takeover, use_queue=False)
 
         except PyComfoConnectNotAllowed:
             # No dice, maybe we are not registered yet...
@@ -344,9 +414,10 @@ class ComfoConnect(object):
             self.cmd_register_app(self._local_uuid, self._local_devicename, self._pin, use_queue=False)
 
             # Login
-            self.cmd_start_session(takeover, use_queue=False)
-
-        return True
+            message = self.cmd_start_session(takeover, use_queue=False)
+        
+        return (message)
+        #return (message.cmd.result == 'OK')
 
     # ==================================================================================================================
     # Message thread
@@ -358,14 +429,19 @@ class ComfoConnect(object):
         # Reinitialise the queues
         self._queue = queue.Queue()
 
-        next_keepalive = 0
+        next_keepalive = time.time() + KEEPALIVE
 
         while not self._stopping:
 
-            # Sends a keepalive every KEEPALIVE seconds.
+            # Sends a keepalive every KEEPALIVE seconds. sys.argv[1] if len(sys.argv) > 1 else 'config.ini'
             if time.time() > next_keepalive:
                 next_keepalive = time.time() + KEEPALIVE
-                self.cmd_keepalive()
+                try:
+                    print('Sending keep alive...' + str(self.cmd_keepalive()))
+                
+                except OSError:
+                    print("Wanted to send keep alive, but hit an unexpected error in _message_thread_loop: ", sys.exc_info()[0])
+                    return
 
             try:
                 # Read a message from the bridge.
@@ -373,6 +449,7 @@ class ComfoConnect(object):
 
             except BrokenPipeError:
                 # Close this thread. The connection_thread will restart us.
+                print("Broken Pipe Error. Clearing message queue and trying to reconnect.")
                 return
 
             if message:
@@ -380,18 +457,26 @@ class ComfoConnect(object):
                     self._handle_rpdo_notification(message)
 
                 elif message.cmd.type == GatewayOperation.GatewayNotificationType:
+                    if self._debug: 
+                        print('GatewayNotificationType')
+                        print(message)
                     # TODO: We should probably handle these somehow
                     pass
 
                 elif message.cmd.type == GatewayOperation.CnNodeNotificationType:
-                    # TODO: We should probably handle these somehow
-                    pass
+                    self._handle_cnnode_notification(message)
 
                 elif message.cmd.type == GatewayOperation.CnAlarmNotificationType:
+                    if self._debug: 
+                        print('CnAlarmNotificationType')
+                        print(message)
                     # TODO: We should probably handle these somehow
                     pass
 
                 elif message.cmd.type == GatewayOperation.CloseSessionRequestType:
+                    if self._debug: 
+                        print('CloseSessionRequestType')
+                        print(message)
                     # Close this thread. The connection_thread will restart us.
                     return
 
@@ -427,6 +512,38 @@ class ComfoConnect(object):
 
         return True
 
+    def _handle_cnnode_notification(self, message):
+        """
+        CnNodeNotificationType
+        | productId | type           | description                                                                             |
+        |-----------|----------------|-----------------------------------------------------------------------------------------|
+        | 1         | ComfoAirQ      | The ComfoAirQ ventilation unit.                                                         |
+        | 2         | ComfoSense     | ComfoSense C                                                                            |
+        | 3         | ComfoSwitch    | ComfoSwitch C                                                                           |
+        | 4         | OptionBox      |                                                                                         |
+        | 5         | ZehnderGateway | ComfoConnect LAN C                                                                      |
+        | 6         | ComfoCool      | ComfoCool Q600                                                                          |
+        | 7         | KNXGateway     | ComfoConnect KNX C                                                                      |
+        | 8         | Service Tool   |                                                                                         |
+        | 9         | PT Tool        | Production test tool                                                                    |
+        | 10        | DVT Tool       | Design verification test tool                                                           |
+        """
+        
+        # Only process CnNodeNotificationType
+        if message.cmd.type != GatewayOperation.CnNodeNotificationType:
+            return False
+
+        # Extract data
+        id = message.msg.productId
+        if id >= 1 and id <= 10:
+            print('Found device: ' + PRODUCT_ID[id])
+        else:
+            print("Unknown Product ID returned: %s" % (id))
+            print(message)
+
+        return True
+
+
     # ==================================================================================================================
     # Commands
     # ==================================================================================================================
@@ -441,7 +558,7 @@ class ComfoConnect(object):
             },
             use_queue=use_queue
         )
-        return reply  # TODO: parse output
+        return reply 
 
     def cmd_close_session(self, use_queue: bool = True):
         """Stops the current session."""
@@ -529,7 +646,7 @@ class ComfoConnect(object):
             },
             use_queue=use_queue
         )
-        return True
+        return reply
 
     def cmd_rpdo_request(self, pdid: int, type: int = 1, zone: int = 1, timeout=None, use_queue: bool = True):
         """Register a RPDO request."""
@@ -549,8 +666,8 @@ class ComfoConnect(object):
     def cmd_keepalive(self, use_queue: bool = True):
         """Sends a keepalive."""
 
-        self._command(
+        reply = self._command(
             KeepAlive,
             use_queue=use_queue
         )
-        return True
+        return (reply == None)

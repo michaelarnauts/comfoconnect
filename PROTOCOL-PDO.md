@@ -23,6 +23,9 @@ Overview of known pdids:
 | 213  | 2    | Avoided Heating: Avoided actual: (`b901` = 441 -> 4.41 W) |
 | 214  | 2    | Avoided Heating: Avoided year-to-date: (`dd01` = 477 kWh) |
 | 215  | 2    | Avoided Heating: Avoided total: (`dd01` = 477 kWh) |
+| 216  | 2    | Avoided Cooling: Avoided actual: (`b901` = 441 -> 4.41 W) |
+| 217  | 2    | Avoided Cooling: Avoided year-to-date: (`dd01` = 477 kWh) |
+| 218  | 2    | Avoided Cooling: Avoided total: (`dd01` = 477 kWh) |
 | 221  | 6    | Temperature & Humidity: Supply Air (`aa00` = 170 -> 17.0 °C) PostHeaterTempAfter |
 | 227  | 1    | Bypass state (`64` = 100%) |
 | 274  | 6    | Temperature & Humidity: Extract Air (`ab00` = 171 -> 17.1 °C) |
@@ -56,9 +59,6 @@ Unknown/uncertain messages:
 | 210  | 0    | *Unknown* (`00` = false) |
 | 211  | 0    | *Unknown* (`00` = false) |
 | 212  | 6    | *Unknown* (`ee00` = 238) |
-| 216  | 2    | *Unknown* (`0000`) |
-| 217  | 2    | *Unknown* (`0000`) |
-| 218  | 2    | *Unknown* (`0000`) |
 | 219  | 2    | *Unknown* (`0000`) |
 | 224  | 1    | *Unknown* (`03` = 3) |
 | 225  | 1    | *Unknown* (`01`) |

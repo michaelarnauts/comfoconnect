@@ -2,6 +2,7 @@ import queue
 import struct
 import threading
 import time
+import logging
 
 from .bridge import Bridge
 from .error import *
@@ -13,6 +14,8 @@ KEEPALIVE = 60
 DEFAULT_LOCAL_UUID = bytes.fromhex('00000000000000000000000000001337')
 DEFAULT_LOCAL_DEVICENAME = 'pycomfoconnect'
 DEFAULT_PIN = 0
+
+_LOGGER = logging.getLogger(DEFAULT_LOCAL_DEVICENAME)
 
 # Product IDs
 """
@@ -151,8 +154,8 @@ class ComfoConnect(object):
             raise Exception('Could not connect to the bridge since there is already an open session.')
 
         except OSError:
-            print("Unexpected error in connect: ", sys.exc_info()[0])
-            print(reply)
+            _LOGGER.info("Unexpected error in connect: ", sys.exc_info()[0])
+            _LOGGER.info(reply)
             raise Exception('Could not connect to the bridge.')
 
         # Set the stopping flag
@@ -251,8 +254,8 @@ class ComfoConnect(object):
             reply = self._bridge.write_message(message)
         
         except OSError:
-            print("Unexpected error in _command._bridge.write_message: ", sys.exc_info()[0])
-            if self._debug: print(reply)
+            _LOGGER.info("Unexpected error in _command._bridge.write_message: ", sys.exc_info()[0])
+            if self._debug: _LOGGER.info(reply)
             return False
 
         try:
@@ -267,7 +270,7 @@ class ComfoConnect(object):
             return None
             
         except OSError:
-            print("Unexpected error in _command._get_reply for confirm type", str(confirm_type), ": ", sys.exc_info()[0])
+            _LOGGER.info("Unexpected error in _command._get_reply for confirm type", str(confirm_type), ": ", sys.exc_info()[0])
             return False
             
 
@@ -328,7 +331,7 @@ class ComfoConnect(object):
             if time.time() - start > timeout:
                 # why raise?
                 #raise ValueError('Timeout waiting for response.')
-                print('Timeout waiting for response.')
+                _LOGGER.info('Timeout waiting for response.')
                 if self.is_connected(): self.disconnect()
                 return False
                 # use print followed by disconnect?
@@ -354,7 +357,7 @@ class ComfoConnect(object):
 
                 except PyComfoConnectOtherSession:
                     self._bridge.disconnect()
-                    print('Could not connect to the bridge since there is already an open session.')
+                    _LOGGER.info('Could not connect to the bridge since there is already an open session.')
                     continue
 
                 except Exception:
@@ -372,17 +375,17 @@ class ComfoConnect(object):
 
                 # Reregister for sensor updates
                 if len(self.sensors)>0:
-                    print('Reconnected to Bridge. Registering sensors...')
+                    _LOGGER.info('Reconnected to Bridge. Registering sensors...')
                     try: 
                         for sensor_id in self.sensors:
                             reply = self.cmd_rpdo_request(sensor_id, self.sensors[sensor_id])
 
                     except OSError:
-                        print("Unexpected error in _connection_thread_loop while registering sensors:", sys.exc_info()[0])
+                        _LOGGER.info("Unexpected error in _connection_thread_loop while registering sensors:", sys.exc_info()[0])
                         self._stopping = True
 
                     else: 
-                        print(str(len(self.sensors)) + ' sensor(s) registered, ready event set.')
+                        _LOGGER.info(str(len(self.sensors)) + ' sensor(s) registered, ready event set.')
 
                 # Send the event that we are ready
                 self._connected.set()
@@ -393,7 +396,7 @@ class ComfoConnect(object):
                 # Close socket connection
                 self._bridge.disconnect()
             else:
-                print('Could not (re)connect to the Bridge. Trying again...')
+                _LOGGER.info('Could not (re)connect to the Bridge. Trying again...')
                
                 
 
@@ -437,10 +440,10 @@ class ComfoConnect(object):
             if time.time() > next_keepalive:
                 next_keepalive = time.time() + KEEPALIVE
                 try:
-                    print('Sending keep alive...' + str(self.cmd_keepalive()))
+                    _LOGGER.info('Sending keep alive...' + str(self.cmd_keepalive()))
                 
                 except OSError:
-                    print("Wanted to send keep alive, but hit an unexpected error in _message_thread_loop: ", sys.exc_info()[0])
+                    _LOGGER.info("Wanted to send keep alive, but hit an unexpected error in _message_thread_loop: ", sys.exc_info()[0])
                     return
 
             try:
@@ -449,7 +452,7 @@ class ComfoConnect(object):
 
             except BrokenPipeError:
                 # Close this thread. The connection_thread will restart us.
-                print("Broken Pipe Error. Clearing message queue and trying to reconnect.")
+                _LOGGER.info("Broken Pipe Error. Clearing message queue and trying to reconnect.")
                 return
 
             if message:
@@ -458,8 +461,8 @@ class ComfoConnect(object):
 
                 elif message.cmd.type == GatewayOperation.GatewayNotificationType:
                     if self._debug: 
-                        print('GatewayNotificationType')
-                        print(message)
+                        _LOGGER.info('GatewayNotificationType')
+                        _LOGGER.info(message)
                     # TODO: We should probably handle these somehow
                     pass
 
@@ -468,15 +471,15 @@ class ComfoConnect(object):
 
                 elif message.cmd.type == GatewayOperation.CnAlarmNotificationType:
                     if self._debug: 
-                        print('CnAlarmNotificationType')
-                        print(message)
+                        _LOGGER.info('CnAlarmNotificationType')
+                        _LOGGER.info(message)
                     # TODO: We should probably handle these somehow
                     pass
 
                 elif message.cmd.type == GatewayOperation.CloseSessionRequestType:
                     if self._debug: 
-                        print('CloseSessionRequestType')
-                        print(message)
+                        _LOGGER.info('CloseSessionRequestType')
+                        _LOGGER.info(message)
                     # Close this thread. The connection_thread will restart us.
                     return
 
@@ -536,10 +539,10 @@ class ComfoConnect(object):
         # Extract data
         id = message.msg.productId
         if id >= 1 and id <= 10:
-            print('Found device: ' + PRODUCT_ID[id])
+            _LOGGER.info('Found device: ' + PRODUCT_ID[id])
         else:
-            print("Unknown Product ID returned: %s" % (id))
-            print(message)
+            _LOGGER.info("Unknown Product ID returned: %s" % (id))
+            _LOGGER.info(message)
 
         return True
 

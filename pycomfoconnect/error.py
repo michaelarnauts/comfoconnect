@@ -4,39 +4,29 @@ class PyComfoConnectError(Exception):
 
 
 class PyComfoConnectBadRequest(PyComfoConnectError):
-    """
-    An error occured because the request was invalid.
-    """
+    """ An error occured because the request was invalid. """
     pass
 
 
 class PyComfoConnectInternalError(PyComfoConnectError):
-    """
-    An error occured because something went wrong inside the bridge.
-    """
+    """ An error occured because something went wrong inside the bridge. """
     pass
 
 
 class PyComfoConnectNotReachable(PyComfoConnectError):
-    """
-    An error occured because the bridge could not reach the ventilation unit.
-    """
+    """ An error occured because the bridge could not reach the ventilation unit. """
     pass
 
 
 class PyComfoConnectOtherSession(PyComfoConnectError):
-    """
-    An error occured because the bridge is already connected to a different device.
-    """
+    """ An error occured because the bridge is already connected to a different device. """
 
     def __init__(self, devicename):
         self.devicename = devicename
 
 
 class PyComfoConnectNotAllowed(PyComfoConnectError):
-    """
-    An error occured because you have not authenticated yet.
-    """
+    """ An error occured because you have not authenticated yet. """
     pass
 
 

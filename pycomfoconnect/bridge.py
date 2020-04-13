@@ -1,9 +1,10 @@
-from __future__ import print_function
-
+import logging
 import select
 import socket
 
 from .message import *
+
+_LOGGER = logging.getLogger('bridge')
 
 
 class Bridge(object):
@@ -115,8 +116,7 @@ class Bridge(object):
         message = Message.decode(msg_len_buf + msg_buf)
 
         # Debug message
-        if self.debug:
-            print("BRIDGE: read_message(): %s" % message)
+        _LOGGER.debug("RX %s", message)
 
         return message
 
@@ -130,8 +130,7 @@ class Bridge(object):
         packet = message.encode()
 
         # Debug message
-        if self.debug:
-            print("BRIDGE: write_message(): %s" % message)
+        _LOGGER.debug("TX %s", message)
 
         # Send packet
         try:

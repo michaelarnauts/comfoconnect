@@ -1,3 +1,4 @@
+import logging
 import queue
 import struct
 import threading
@@ -13,6 +14,8 @@ KEEPALIVE = 60
 DEFAULT_LOCAL_UUID = bytes.fromhex('00000000000000000000000000001337')
 DEFAULT_LOCAL_DEVICENAME = 'pycomfoconnect'
 DEFAULT_PIN = 0
+
+_LOGGER = logging.getLogger('comfoconnect')
 
 # Sensor variable size
 RPDO_TYPE_MAP = {
@@ -304,7 +307,7 @@ class ComfoConnect(object):
 
                 except PyComfoConnectOtherSession:
                     self._bridge.disconnect()
-                    print('Could not connect to the bridge since there is already an open session.')
+                    _LOGGER.error('Could not connect to the bridge since there is already an open session.')
                     continue
 
                 except Exception:

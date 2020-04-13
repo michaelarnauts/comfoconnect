@@ -137,7 +137,6 @@ class ComfoConnect(object):
 
         except OSError:
             _LOGGER.error("Unexpected error in connect: ", sys.exc_info()[0])
-            _LOGGER.debug(reply)
             raise Exception('Could not connect to the bridge.')
 
         # Set flags to signal messages are being handled and we are not disconnecting
@@ -166,17 +165,6 @@ class ComfoConnect(object):
             self._connection_thread.join()
             self._connection_thread = None
 
-    def clear_queue(self):
-        """Clear the queue because a connection error occured."""
-        
-        # Set stop handling messages flag
-        self._stopping = True
-
-        # Wait for the background thread to finish in case it is still active
-        if self._message_thread != None:
-            self._message_thread.join()
-            self._message_thread = None
-        
     def is_connected(self):
         """Returns whether there is a connection with the bridge."""
 
@@ -239,7 +227,6 @@ class ComfoConnect(object):
         
         except OSError:
             _LOGGER.error("Unexpected error in _command._bridge.write_message: ", sys.exc_info()[0])
-            _LOGGER.debug(reply)
             return False
 
         try:
@@ -401,8 +388,7 @@ class ComfoConnect(object):
             # Login
             message = self.cmd_start_session(takeover, use_queue=False)
         
-        return (message)
-        #return (message.cmd.result == 'OK')
+        return message
 
     # ==================================================================================================================
     # Message thread
@@ -443,19 +429,16 @@ class ComfoConnect(object):
 
                 elif message.cmd.type == GatewayOperation.GatewayNotificationType:
                     _LOGGER.info('Unhandled GatewayNotificationType')
-                    _LOGGER.debug(message)
                     # TODO: We should probably handle these somehow
                     pass
 
                 elif message.cmd.type == GatewayOperation.CnNodeNotificationType:
                     _LOGGER.info('Unhandled CnNodeNotificationType')
-                    _LOGGER.debug(message)
                     # TODO: We should probably handle these somehow
                     pass
 
                 elif message.cmd.type == GatewayOperation.CnAlarmNotificationType:
                     _LOGGER.info('Unhandled CnAlarmNotificationType')
-                    _LOGGER.debug(message)
                     # TODO: We should probably handle these somehow
                     pass
 
@@ -622,4 +605,4 @@ class ComfoConnect(object):
             KeepAlive,
             use_queue=use_queue
         )
-        return (reply == None)
+        return reply == None

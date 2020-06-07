@@ -2,9 +2,12 @@ Overview of known pdids:
 
 | pdid | type | description                                                                                            |
 |------|------|--------------------------------------------------------------------------------------------------------|
+| 16   | 1    | Away indicator (`01` = low, medium, high fan speed, `07` = away) |
 | 49   | 1    | Operating mode (`01` = limited manual, `05` = unlimited manual, `ff` = auto) |
 | 56   | 1    | Operating mode (`01` = unlimited manual, `ff` = auto) |
 | 65   | 1    | Fans: Fan speed setting (`00` (away), `01`, `02` or `03`) |
+| 66   | 1    | Bypass activation mode (`00` = auto, `01` = activated, `02` = deactivated) |
+| 67   | 1    | Temperature Profile (`00` = normal, `01` = cold, `02` = warm) |
 | 81   | 3    | General: Countdown until next fan speed change (`52020000` = 00000252 -> 594 seconds) |
 | 117  | 1    | Fans: Exhaust fan duty (`1c` = 28%) |
 | 118  | 1    | Fans: Supply fan duty (`1d` = 29%) |
@@ -42,12 +45,9 @@ Unknown/uncertain messages:
 
 | pdid | type | description                                                                                            |
 |------|------|--------------------------------------------------------------------------------------------------------|
-| 16   | 1    | *Unknown* (`01`) |
 | 33   | 1    | *Unknown* (`01`) |
 | 37   | 1    | *Unknown* (`00`) |
 | 53   | 1    | *Unknown* (`ff`) |
-| 66   | 1    | *Unknown* (`00`) |
-| 67   | 1    | *Unknown* (`00`) |
 | 70   | 1    | *Unknown* (`00`) |
 | 71   | 1    | *Unknown* (`00`) |
 | 82   | 3    | *Unknown* (`ffffffff`) |

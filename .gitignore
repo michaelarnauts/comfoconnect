@@ -8,3 +8,4 @@
 # Build-related files
 /*.egg-info
 /dist/
+/build/

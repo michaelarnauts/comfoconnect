@@ -23,6 +23,7 @@ Overview of known pdids:
 | 146  | 2    | Preheater Power Consumption: Current Ventilation (`0f00` = 15 W)  |
 | 192  | 2    | Days left before filters must be replaced (`8200` = 130 days) |
 | 209  | 6    | Current RMOT (`7500` = 117 -> 11.7 °C) |
+| 212  | 1    | Temperature profile target (`ee00` = 23.8 °C)|
 | 213  | 2    | Avoided Heating: Avoided actual: (`b901` = 441 -> 4.41 W) |
 | 214  | 2    | Avoided Heating: Avoided year-to-date: (`dd01` = 477 kWh) |
 | 215  | 2    | Avoided Heating: Avoided total: (`dd01` = 477 kWh) |
@@ -58,7 +59,6 @@ Unknown/uncertain messages:
 | 208  | 1    | *Unknown* (`00`), Unit of temperature |
 | 210  | 0    | *Unknown* (`00` = false) |
 | 211  | 0    | *Unknown* (`00` = false) |
-| 212  | 6    | *Unknown* (`ee00` = 238) |
 | 219  | 2    | *Unknown* (`0000`) |
 | 224  | 1    | *Unknown* (`03` = 3) |
 | 225  | 1    | *Unknown* (`01`) |

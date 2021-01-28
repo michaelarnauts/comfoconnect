@@ -162,8 +162,8 @@ It can probably completely brick your ventilation. (it enters factory mode or tr
 | 0x01      | 0x0B      | ro      | STRING    | Article number                                              |
 | 0x01      | 0x0D      | ro      | STRING    | Country (Manufacturing or Current?)                         |
 | 0x01      | 0x14      | ro      | STRING    | "ComfoAirQ"                                                 |
-| 0x1D      | 0x02      | rw      | INT16     | RMOT for cooling period                                     |
-| 0x1D      | 0x03      | rw      | INT16     | RMOT for heating period                                     |
+| 0x1D      | 0x02      | rw      | INT16     | RMOT for heating period                                     |
+| 0x1D      | 0x03      | rw      | INT16     | RMOT for cooling period                                     |
 | 0x1D      | 0x04      | rw      | UINT8     | Passive temperature control (off, autoonly, on)             |
 | 0x1D      | 0x05      | rw      | UINT8     | unknown (off, autoonly, on)                                 |
 | 0x1D      | 0x06      | rw      | UINT8     | Humidity comfort control (off, autoonly, on)                |

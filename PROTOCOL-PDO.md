@@ -2,9 +2,12 @@ Overview of known pdids:
 
 | pdid | type | description                                                                                            |
 |------|------|--------------------------------------------------------------------------------------------------------|
+| 16   | 1    | Away indicator (`01` = low, medium, high fan speed, `07` = away) |
 | 49   | 1    | Operating mode (`01` = limited manual, `05` = unlimited manual, `ff` = auto) |
 | 56   | 1    | Operating mode (`01` = unlimited manual, `ff` = auto) |
 | 65   | 1    | Fans: Fan speed setting (`00` (away), `01`, `02` or `03`) |
+| 66   | 1    | Bypass activation mode (`00` = auto, `01` = activated, `02` = deactivated) |
+| 67   | 1    | Temperature Profile (`00` = normal, `01` = cold, `02` = warm) |
 | 81   | 3    | General: Countdown until next fan speed change (`52020000` = 00000252 -> 594 seconds) |
 | 117  | 1    | Fans: Exhaust fan duty (`1c` = 28%) |
 | 118  | 1    | Fans: Supply fan duty (`1d` = 29%) |
@@ -20,9 +23,13 @@ Overview of known pdids:
 | 146  | 2    | Preheater Power Consumption: Current Ventilation (`0f00` = 15 W)  |
 | 192  | 2    | Days left before filters must be replaced (`8200` = 130 days) |
 | 209  | 6    | Current RMOT (`7500` = 117 -> 11.7 °C) |
+| 212  | 1    | Temperature profile target (`ee00` = 23.8 °C)|
 | 213  | 2    | Avoided Heating: Avoided actual: (`b901` = 441 -> 4.41 W) |
 | 214  | 2    | Avoided Heating: Avoided year-to-date: (`dd01` = 477 kWh) |
 | 215  | 2    | Avoided Heating: Avoided total: (`dd01` = 477 kWh) |
+| 216  | 2    | Avoided Cooling: Avoided actual: (`b901` = 441 -> 4.41 W) |
+| 217  | 2    | Avoided Cooling: Avoided year-to-date: (`dd01` = 477 kWh) |
+| 218  | 2    | Avoided Cooling: Avoided total: (`dd01` = 477 kWh) |
 | 221  | 6    | Temperature & Humidity: Supply Air (`aa00` = 170 -> 17.0 °C) PostHeaterTempAfter |
 | 227  | 1    | Bypass state (`64` = 100%) |
 | 274  | 6    | Temperature & Humidity: Extract Air (`ab00` = 171 -> 17.1 °C) |
@@ -39,12 +46,9 @@ Unknown/uncertain messages:
 
 | pdid | type | description                                                                                            |
 |------|------|--------------------------------------------------------------------------------------------------------|
-| 16   | 1    | *Unknown* (`01`) |
 | 33   | 1    | *Unknown* (`01`) |
 | 37   | 1    | *Unknown* (`00`) |
 | 53   | 1    | *Unknown* (`ff`) |
-| 66   | 1    | *Unknown* (`00`) |
-| 67   | 1    | *Unknown* (`00`) |
 | 70   | 1    | *Unknown* (`00`) |
 | 71   | 1    | *Unknown* (`00`) |
 | 82   | 3    | *Unknown* (`ffffffff`) |
@@ -55,10 +59,6 @@ Unknown/uncertain messages:
 | 208  | 1    | *Unknown* (`00`), Unit of temperature |
 | 210  | 0    | *Unknown* (`00` = false) |
 | 211  | 0    | *Unknown* (`00` = false) |
-| 212  | 6    | *Unknown* (`ee00` = 238) |
-| 216  | 2    | *Unknown* (`0000`) |
-| 217  | 2    | *Unknown* (`0000`) |
-| 218  | 2    | *Unknown* (`0000`) |
 | 219  | 2    | *Unknown* (`0000`) |
 | 224  | 1    | *Unknown* (`03` = 3) |
 | 225  | 1    | *Unknown* (`01`) |

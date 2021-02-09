@@ -35,10 +35,12 @@ Overview of known pdids:
 | 274  | 6    | Temperature & Humidity: Extract Air (`ab00` = 171 -> 17.1 °C) |
 | 275  | 6    | Temperature & Humidity: Exhaust Air (`5600` = 86 -> 8.6 °C) |
 | 276  | 6    | Temperature & Humidity: Outdoor Air (`3c00` = 60 -> 6.0 °C) |
+| 277  | 6    | Temperature & Humidity: Preheated Outdoor Air (`3c00` = 60 -> 6.0 °C) |
 | 278  | 6    | PostHeaterTempBefore |
 | 290  | 1    | Temperature & Humidity: Extract Air (`31` = 49%) |
 | 291  | 1    | Temperature & Humidity: Exhaust Air (`57` = 87%) |
 | 292  | 1    | Temperature & Humidity: Outdoor Air (`43` = 67%) |
+| 293  | 1    | Temperature & Humidity: Preheated Outdoor Air (`43` = 67%) |
 | 294  | 1    | Temperature & Humidity: Supply Air (`23` = 35%) |
 | 785  | 0    | ComfoCoolCompressor State |
 

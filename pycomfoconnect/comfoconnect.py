@@ -119,6 +119,11 @@ class ComfoConnect(object):
 
         self.sensors = {}
 
+        # with Lan-C version U1.2.6, the bridge sends a bunch of 0-values after a re-connect, before sending the real 
+        # values. To filter these bogus values, we store the IDs of sensors for which we received the 0-value already.
+        # This set is reset on every connect.
+        self._initial_zero_received = set()
+
     # ==================================================================================================================
     # Core functions
     # ==================================================================================================================
@@ -369,6 +374,9 @@ class ComfoConnect(object):
 
         next_keepalive = 0
 
+        # reset initial zero book keeping
+        self._initial_zero_received = set()
+
         while not self._stopping:
 
             # Sends a keepalive every KEEPALIVE seconds.
@@ -435,9 +443,12 @@ class ComfoConnect(object):
 
         # Update local state
         # self.sensors[message.msg.pdid] = val
-
-        if self.callback_sensor:
-            self.callback_sensor(message.msg.pdid, val)
+        if val != 0 or message.msg.pdid in self._initial_zero_received:
+            if self.callback_sensor:
+                self.callback_sensor(message.msg.pdid, val)
+        else:
+            _LOGGER.debug("Ignoring 0 for %r after re-connect", message.msg.pdid)
+            self._initial_zero_received.add(message.msg.pdid)
 
         return True
 

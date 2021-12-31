@@ -96,6 +96,19 @@ RPDO_TYPE_MAP = {
     419: 0,
 }
 
+# Product ID Map
+PRODUCT_ID_MAP = {
+    1: "ComfoAirQ",
+    2: "ComfoSense",
+    3: "ComfoSwitch",
+    4: "OptionBox",
+    5: "ZehnderGateway",
+    6: "ComfoCool",
+    7: "KNXGateway",
+    8: "Service Tool",
+    9: "Production test tool",
+    10: "Design verification test tool"
+}
 
 class ComfoConnect(object):
     """Implements the commands to communicate with the ComfoConnect ventilation unit."""
@@ -395,7 +408,10 @@ class ComfoConnect(object):
                     pass
 
                 elif message.cmd.type == GatewayOperation.CnNodeNotificationType:
-                    _LOGGER.info('Unhandled CnNodeNotificationType')
+                    _LOGGER.info('CnNodeNotificationType: %s @ Node Id %d [%s]', 
+                        PRODUCT_ID_MAP[message.msg.productId], 
+                        message.msg.nodeId, 
+                        message.msg.NodeModeType.Name(message.msg.mode))
                     # TODO: We should probably handle these somehow
                     pass
 

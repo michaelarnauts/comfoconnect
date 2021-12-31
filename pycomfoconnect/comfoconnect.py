@@ -382,7 +382,7 @@ class ComfoConnect(object):
 
             except BrokenPipeError as exc:
                 # Close this thread. The connection_thread will restart us.
-                _LOGGER.warning('THe connection was broken. We will try to reconnect later.')
+                _LOGGER.warning('The connection was broken. We will try to reconnect later.')
                 return
 
             if message:

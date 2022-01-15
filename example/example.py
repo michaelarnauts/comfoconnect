@@ -80,8 +80,8 @@ def main():
     # comfoconnect.register_sensor(SENSOR_FAN_SUPPLY_SPEED)  # Fans: Supply fan speed
     # comfoconnect.register_sensor(SENSOR_FAN_EXHAUST_SPEED)  # Fans: Exhaust fan speed
     # comfoconnect.register_sensor(SENSOR_POWER_CURRENT)  # Power Consumption: Current Ventilation
-    # comfoconnect.register_sensor(SENSOR_POWER_TOTAL_YEAR)  # Power Consumption: Total year-to-date
-    # comfoconnect.register_sensor(SENSOR_POWER_TOTAL)  # Power Consumption: Total from start
+    # comfoconnect.register_sensor(SENSOR_ENERGY_TOTAL_YEAR)  # Power Consumption: Total year-to-date
+    # comfoconnect.register_sensor(SENSOR_ENERGY_TOTAL)  # Power Consumption: Total from start
     # comfoconnect.register_sensor(SENSOR_DAYS_TO_REPLACE_FILTER)  # Days left before filters must be replaced
     # comfoconnect.register_sensor(SENSOR_AVOIDED_HEATING_CURRENT)  # Avoided Heating: Avoided actual
     # comfoconnect.register_sensor(SENSOR_AVOIDED_HEATING_TOTAL_YEAR)  # Avoided Heating: Avoided year-to-date

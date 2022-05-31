@@ -70,9 +70,11 @@ RPDO_TYPE_MAP = {
     274: 6,
     275: 6,
     276: 6,
+    277: 6,
     290: 1,
     291: 1,
     292: 1,
+    293: 1,
     294: 1,
     321: 2,
     325: 2,
@@ -94,6 +96,19 @@ RPDO_TYPE_MAP = {
     419: 0,
 }
 
+# Product ID Map
+PRODUCT_ID_MAP = {
+    1: "ComfoAirQ",
+    2: "ComfoSense",
+    3: "ComfoSwitch",
+    4: "OptionBox",
+    5: "ZehnderGateway",
+    6: "ComfoCool",
+    7: "KNXGateway",
+    8: "Service Tool",
+    9: "Production test tool",
+    10: "Design verification test tool"
+}
 
 class ComfoConnect(object):
     """Implements the commands to communicate with the ComfoConnect ventilation unit."""
@@ -420,7 +435,7 @@ class ComfoConnect(object):
 
             except BrokenPipeError as exc:
                 # Close this thread. The connection_thread will restart us.
-                _LOGGER.warning("The connection was broken. We will try to reconnect later.")
+                _LOGGER.warning('The connection was broken. We will try to reconnect later.')
                 return
 
             if message:
@@ -433,7 +448,10 @@ class ComfoConnect(object):
                     pass
 
                 elif message.cmd.type == GatewayOperation.CnNodeNotificationType:
-                    _LOGGER.info('Unhandled CnNodeNotificationType')
+                    _LOGGER.info('CnNodeNotificationType: %s @ Node Id %d [%s]', 
+                        PRODUCT_ID_MAP[message.msg.productId], 
+                        message.msg.nodeId, 
+                        message.msg.NodeModeType.Name(message.msg.mode))
                     # TODO: We should probably handle these somehow
                     pass
 
